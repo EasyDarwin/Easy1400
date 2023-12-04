@@ -100,7 +100,7 @@ export function setToken(token: string, id: number) {
 service.interceptors.request.use((config) => {
   config.headers!['Content-Type'] = 'application/json';
   const token: string = getToken();
-//   config.headers['authorization'] = `Bearer ${token}`;
+  config.headers!['authorization'] = `Bearer ${token}`;
   return config;
 });
 

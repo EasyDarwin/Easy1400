@@ -4,16 +4,31 @@ export default defineConfig({
   routes: [
     {
       path: '/',
-      redirect: '/home',
+      redirect: '/login',
     },
     {
-      name: '首页',
-      path: '/home',
-      component: './home',
+      path: '/login',
+      component: 'login/view',
+      layout: false,
+    },
+    {
+      name: '设备',
+      path: '/devices',
+      component: 'device/view',
+    },
+    {
+      name: '图库',
+      path: '/gallery',
+      component: 'gallery/view',
+    },
+    {
+      name: '级联',
+      path: '/cascade',
+      component: 'cascade/view',
     },
   ],
   antd: {},
-  reactQuery:{},
+  reactQuery: {},
   access: {},
   model: {},
   initialState: {},
@@ -21,7 +36,7 @@ export default defineConfig({
   publicPath: '/',
   history: { type: 'hash' },
   layout: {
-    title: '',
+    title: '1400视图库管理系统',
   },
   define: {
     'process.env': {
@@ -29,6 +44,7 @@ export default defineConfig({
       SOME_KEY: 'value',
       WEB_VERSION: '0.0.1',
       BASEURL: '/api',
+      PAGE_TITLE: false, //是否显示页面title
     },
   },
   tailwindcss: {},
