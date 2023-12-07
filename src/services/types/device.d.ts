@@ -23,21 +23,25 @@ declare namespace Device {
   };
 
   type AddReq = {
-    /**
-     * 设备唯一标识
-     */
+    ext: Ext;
     id: string;
-    /**
-     * 设备名
-     */
     name: string;
-    /**
-     * 密码
-     */
     password: string;
-    /**
-     * 用户名，非必填，建议为空
-     */
-    username?: string;
+    username: string;
+  };
+
+  type Ext = {
+    area: string;
+    direction: string;
+    ipv4: string;
+    ipv6: string;
+    latitude: number;
+    longitude: number;
+    model: string;
+    organize: string;
+    owner_id: string;
+    place: string;
+    place_code: string;
+    port: number;
   };
 }
