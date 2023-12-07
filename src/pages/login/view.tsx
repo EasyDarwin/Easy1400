@@ -1,10 +1,9 @@
+import { WELCOME_MESSAGE } from '@/constants/index';
 import { ErrorHandle, getToken, setToken } from '@/services/http/http';
 import { GetCaptcha, Login, getCaptcha } from '@/services/http/login';
 import { Button, Form, Input, notification } from 'antd';
-import {WELCOME_MESSAGE} from '@/constants/index'
 
 import { history, useMutation, useQuery } from '@umijs/max';
-import { useEffect } from 'react';
 import './view.less';
 
 interface ILoginParams {
@@ -25,27 +24,29 @@ export default function Page() {
   // }, []);
 
   //计算当前时间 显示登录问候
-  const welcomeMessage = () =>{
-    let welcomeText:{message:string;description:string} = {message:"",description:""};
+  const welcomeMessage = () => {
+    let welcomeText: { message: string; description: string } = {
+      message: '',
+      description: '',
+    };
     const currentTime = new Date().getHours();
-    if(currentTime >= 0 && currentTime < 12){
+    if (currentTime >= 0 && currentTime < 12) {
       welcomeText = WELCOME_MESSAGE.morning;
-    }else if(currentTime >= 12 && currentTime < 14){
+    } else if (currentTime >= 12 && currentTime < 14) {
       welcomeText = WELCOME_MESSAGE.noon;
-    }else if(currentTime >= 14 && currentTime < 18){
+    } else if (currentTime >= 14 && currentTime < 18) {
       welcomeText = WELCOME_MESSAGE.afternoon;
-    }else {
+    } else {
       welcomeText = WELCOME_MESSAGE.night;
     }
-    setTimeout(()=>{
+    setTimeout(() => {
       notification.success({
-        message:welcomeText.message,
-        description:welcomeText.description,
-        duration:3
+        message: welcomeText.message,
+        description: welcomeText.description,
+        duration: 3,
       });
-    },500)
-  }
-
+    }, 500);
+  };
 
   const {
     data: captchaData,
@@ -91,11 +92,7 @@ export default function Page() {
           >
             <div>
               <div className="mt-2">
-                <Form.Item
-                  label="账户"
-                  name="username"
-                  initialValue={'admin'}
-                >
+                <Form.Item label="账户" name="username" initialValue={'admin'}>
                   <Input />
                 </Form.Item>
               </div>
@@ -118,9 +115,9 @@ export default function Page() {
                     type="password"
                   />
                 </Form.Item>
-                <div className="ml-1" >
+                <div className="ml-1">
                   <img
-                    className="object-cover w-24 h-8 "
+                    className="object-cover w-24 h-8 mt-1.5"
                     src={captchaData?.base64}
                     onClick={() => refetch()}
                   />
@@ -139,7 +136,7 @@ export default function Page() {
           </Form>
 
           <p className="mt-10 text-center text-sm text-gray-500">
-            版本号{' '}{`${process.env.WEB_VERSION}`}
+            版本号 {`${process.env.WEB_VERSION}`}
           </p>
         </div>
       </div>

@@ -1,6 +1,3 @@
-import FunctionBar, { ButtonList } from '@/components/bar/FunctionBar';
-import Box from '@/components/box/Box';
-import CopyBtn from '@/components/copy/CopyBtn';
 import {
   DeleteOutlined,
   EditOutlined,
@@ -8,100 +5,162 @@ import {
   UnorderedListOutlined,
 } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
-import { useMutation, useQuery } from '@umijs/max';
+import { history, useMutation, useQuery } from '@umijs/max';
 import { Button, Popconfirm, Space, Table, Tag, Tooltip, message } from 'antd';
-import DeviceFrom from './components/DeviceFrom';
+import React, { useRef, useState } from 'react';
 
 import { shortenString } from '@/package/string/string';
 import {
-  DeleteDevice,
-  GetDeviceList,
+  DelDevice,
+  FindDeviceLists,
   getDeviceList,
 } from '@/services/http/device';
 import { ErrorHandle } from '@/services/http/http';
 import { ColumnsType } from 'antd/es/table';
-import React, { useRef, useState } from 'react';
+import { AxiosResponse } from 'axios';
+
+import FunctionBar, {
+  ButtonList,
+  SearchComponent,
+} from '@/components/bar/FunctionBar';
+import Box from '@/components/box/Box';
+import CopyBtn from '@/components/copy/CopyBtn';
+import { POLLING_TIME } from '@/constants/index';
+import DeviceFrom from './components/DeviceFrom';
 
 interface IDeviceFrom {
-  setFieldsValue: () => void;
+  setFieldsValue: (data?: Device.APEObject, isEdit?: boolean) => void;
 }
 
 const View: React.FC = () => {
   const deviceFromRef = useRef<IDeviceFrom>();
 
-  const columns: ColumnsType<Device.Item> = [
+  const columns: ColumnsType<Device.APEObject> = [
     {
       title: 'ID',
-      dataIndex: 'id',
+      dataIndex: 'ApeID',
       align: 'center',
       ellipsis: {
         showTitle: false,
       },
+      width: 130,
       render: (text: string) => (
         <Tooltip title={text}>{shortenString(text)}</Tooltip>
       ),
     },
     {
-      title: '秘钥',
-      dataIndex: 'password',
+      title: '名称',
+      dataIndex: 'Name',
       align: 'center',
-      render: (text: string) => <CopyBtn value={text} />,
+      width: 150,
     },
+
     {
-      title: '是否在线',
-      dataIndex: 'is_online',
+      title: '用户账号',
+      dataIndex: 'UserId',
       align: 'center',
-      render: (text: string) => (
-        <Tag color={text ? 'green' : 'red'}>{text ? '在线' : '离线'}</Tag>
+      width: 110,
+      render: (text: string, record: Device.APEObject) => (
+        <CopyBtn value={text} title="账号" disabled={record.IsOnline === '1'} />
       ),
     },
     {
-      title: '注册时间',
-      dataIndex: 'register_at',
+      title: '口令',
+      dataIndex: 'Password',
       align: 'center',
-      render: (text: string) => (
-        <span className="text-gray-400">{text ? text : '-'}</span>
+      width: 110,
+      render: (text: string, record: Device.APEObject) => (
+        <CopyBtn value={text} title="口令" disabled={record.IsOnline === '1'} />
       ),
     },
     {
-      title: '心跳时间',
-      dataIndex: 'heartbeat_at',
+      title: '状态',
+      dataIndex: 'IsOnline',
       align: 'center',
-      render: (text: string) => <span>{text ? text : '-'}</span>,
+      width: 110,
+      render: (text: string, record: Device.APEObject) => (
+        <Tag color={record.IsOnline === '1' ? 'green' : 'red'}>
+          {record.IsOnline === '1' ? '在线' : '离线'}
+        </Tag>
+      ),
+    },
+    {
+      title: '心跳时间/注册时间',
+      dataIndex: 'HeartbeatAt',
+      align: 'center',
+      width: 180,
+      render: (text: string, record: Device.APEObject) => (
+        <>
+          <div>
+            <Tooltip title={'心跳时间'} placement="left">
+              {record.HeartbeatAt ? record.HeartbeatAt : '-'}
+            </Tooltip>
+          </div>
+          <div>
+            <Tooltip
+              className="text-gray-400"
+              title={'注册时间'}
+              placement="left"
+            >
+              {record.RegisteredAt ? record.RegisteredAt : '-'}
+            </Tooltip>
+          </div>
+        </>
+      ),
+    },
+    {
+      title: 'IP',
+      dataIndex: 'IPAddr',
+      align: 'center',
+      width: 150,
+      render: (text: string, record: Device.APEObject) => <span>{text}</span>,
     },
     {
       title: '操作',
       align: 'center',
       fixed: 'right',
       width: 150,
-      render: (text: string, record: any) => {
+      render: (text: string, record: Device.APEObject) => {
         return (
           <Space>
             <Tooltip title="图片列表">
-              <Button icon={<UnorderedListOutlined />} />
+              <Button
+                icon={<UnorderedListOutlined />}
+                onClick={() => {
+                  history.push(`/gallery?device_id=${record.ApeID}`);
+                }}
+              />
             </Tooltip>
             <Tooltip title="编辑设备">
-              <Button icon={<EditOutlined />} />
+              <Button
+                onClick={() =>
+                  deviceFromRef.current?.setFieldsValue(record, true)
+                }
+                icon={<EditOutlined />}
+                // loading={
+                //   record.ApeID == currentDeviceId && getDeviceInfoLoading
+                // }
+              />
             </Tooltip>
             <Tooltip title="删除设备">
               <Popconfirm
                 title={
                   <p>
                     确定删除
-                    <span className="text-red-500"> {record.id} </span>
+                    <span className="text-red-500"> {record.ApeID} </span>
                     设备吗?
                   </p>
                 }
                 okButtonProps={{
-                  loading: loadings.includes(record.id),
+                  loading: loadings.includes(record.ApeID),
                 }}
                 onConfirm={() => {
-                  deleteDeviceMutate(record.id);
+                  deleteDeviceMutate(record.ApeID);
                 }}
               >
                 <Button
                   type="dashed"
-                  loading={loadings.includes(record.id)}
+                  loading={loadings.includes(record.ApeID)}
                   danger
                   icon={<DeleteOutlined />}
                 />
@@ -114,11 +173,11 @@ const View: React.FC = () => {
   ];
   const [loadings, setLoadings] = useState<string[]>([]);
 
-  const { mutate: deleteDeviceMutate } = useMutation(DeleteDevice, {
+  const { mutate: deleteDeviceMutate } = useMutation(DelDevice, {
     onMutate: (v: string) => {
       setLoadings([...loadings, v]);
     },
-    onSuccess: (data: any) => {
+    onSuccess: (data: AxiosResponse) => {
       message.success('删除成功');
       setLoadings((v) => v.filter((item) => item !== data.data.id));
       refetch();
@@ -129,18 +188,23 @@ const View: React.FC = () => {
     },
   });
 
-  const [pagination, setPagination] = useState<Device.ListReq>({
-    page: 1,
-    size: 10,
-    device_id: '',
+  const [pagination, setPagination] = useState<Device.Pager>({
+    ApeID: '',
+    PageRecordNum: 10,
+    RecordStartNo: 1,
   });
 
   const {
     data: deviceData,
     isLoading: deviceListLoading,
     refetch,
-  } = useQuery<Device.ListRes>([getDeviceList], () =>
-    GetDeviceList(pagination).then((res) => res.data as Device.ListRes),
+  } = useQuery<Device.FindReq>(
+    [getDeviceList, pagination],
+    () => FindDeviceLists({ ...pagination }).then((res) => res.data),
+    {
+      onError: ErrorHandle,
+      refetchInterval: POLLING_TIME,
+    },
   );
 
   //点击添加按钮
@@ -149,7 +213,6 @@ const View: React.FC = () => {
   };
 
   const funcBtnList: ButtonList[] = [
-    //顶部按钮列表
     {
       label: '添加',
       loading: false,
@@ -159,24 +222,42 @@ const View: React.FC = () => {
     },
   ];
 
+  const funcSearchComponet: SearchComponent = {
+    placeholder: '请输入设备id',
+    onSearch: (value: string) => {
+      setPagination({ ...pagination, ApeID: value });
+    },
+  };
   return (
     <PageContainer title={process.env.PAGE_TITLE}>
-      <FunctionBar btnChannle={funcBtnList} />
+      <Box>
+        <FunctionBar
+          searchChannle={funcSearchComponet}
+          btnChannle={funcBtnList}
+        />
+      </Box>
       <Box>
         <Table
           loading={deviceListLoading}
-          rowKey={'id'}
+          rowKey={'ApeID'}
           key={'system_app_table_key'}
-          bordered
+          // bordered
           columns={columns}
-          dataSource={deviceData?.items}
+          dataSource={deviceData?.APEListObject.APEObject}
           pagination={{
-            total: deviceData?.total,
-            pageSize: pagination.size,
-            current: pagination.page,
-            onChange: (page, size) => {
-              setPagination({ ...pagination, page, size });
+            total: deviceData?.APEListObject.TotalNum,
+            pageSize: pagination.PageRecordNum,
+            current: pagination.RecordStartNo,
+            onChange: (RecordStartNo, PageRecordNum) => {
+              setPagination({
+                ...pagination,
+                RecordStartNo,
+                PageRecordNum,
+              });
             },
+            showTotal: (total) => `共 ${total} 条`,
+            showSizeChanger: true,
+            pageSizeOptions: [10, 50, 100],
           }}
         />
       </Box>

@@ -16,16 +16,24 @@ npx umi g page device/view 将会自动写入 Write: src/pages/products.tsx Writ
 2. 可读性，你的同事能够很轻松的看懂代码，多写注释，更明确的变量名
 
 ## api 命名规范
+
 1. react-quyer 查询键名 常量 小写 与查询函数同名
 2. api 函数 采用大驼峰形式
+
 ```javascript
 // good
 export const findRecordsConfig = 'FindRecordsConfig';
 // FindRecordsConfig 查询录像配置
-export async function FindRecordsConfig(data: { page: number; size: number }) {
-  return await GET<Record.FindRecordTemplatesResp>(`/records/plans`, data);
+export async function FindRecordsConfig(data: { page: number, size: number }) {
+  return (
+    (await GET) < Record.FindRecordTemplatesResp > (`/records/plans`, data)
+  );
 }
 
+// GET      findDevices,  getDevice
+// POST     addDevice, addDevices
+// PUT      editDevice,editDevices
+// DELETE   delDevice, delDevices
 ```
 
 # React 规范
@@ -48,21 +56,24 @@ export async function FindRecordsConfig(data: { page: number; size: number }) {
 5. 组件导出，建议采用 export default 的方式导出，并且组件名采用大驼峰命名法,这样在导入时不需要解构
 
 ```jsx
-const AddDeviceView: React.FC<{ref: any; refresh: () => void;}> = React.forwardRef(({ refresh }, ref) => {
-  useImperativeHandle(ref, () => ({
-    setFieldsWithModal: (isUpdate: boolean, v: any) => {
-      setIsUpdate(isUpdate);
-      form.setFieldsValue(v);
-      setOpen(true);
-    },
-  }));
-})
+const AddDeviceView: React.FC<{ ref: any, refresh: () => void }> =
+  React.forwardRef(({ refresh }, ref) => {
+    useImperativeHandle(ref, () => ({
+      setFieldsWithModal: (isUpdate: boolean, v: any) => {
+        setIsUpdate(isUpdate);
+        form.setFieldsValue(v);
+        setOpen(true);
+      },
+    }));
+  });
 
 export default AddDeviceView;
 ```
-6. 如果这个组件尽在当前页面使用，不是通用组件，则推荐在当前页面目录下新建一个components文件夹
+
+6. 如果这个组件尽在当前页面使用，不是通用组件，则推荐在当前页面目录下新建一个 components 文件夹
 7. 页面统一以 **View** 结尾，组件平铺在页面上的 以 **Box** 结尾，弹窗组件以 **Modal** 结尾
 8. 使用组件标签时 建议使用**单标签**形式
+
 ## 标签 以及 属性
 
 1. 如果标签有多个属性，且存在换行，则每个属性都需要换行独占一行
@@ -80,22 +91,25 @@ export default AddDeviceView;
 ```
 
 ## 事件 以及 方法
+
 1. 如果是复杂的方法建议定义一个 方法，而不是直接写在标签中
-2. 如果是人为触发的时间采用 **on+ 事件 + 作用 如onClickDelete**    如果是其他方式触发可以采用 handle + 作用
+2. 如果是人为触发的时间采用 **on+ 事件 + 作用 如 onClickDelete** 如果是其他方式触发可以采用 handle + 作用
 
 ## hooks 的使用
-1. 如果获取dom，或者组件实例，变量名采用 组件或者dom + Ref的方式 如 userRef
-2. **[注意]** 如果一个变量不会控制dom刷新，并且需要保留值，需要采用useRef，而不是一味的useState
+
+1. 如果获取 dom，或者组件实例，变量名采用 组件或者 dom + Ref 的方式 如 userRef
+2. **[注意]** 如果一个变量不会控制 dom 刷新，并且需要保留值，需要采用 useRef，而不是一味的 useState
+
 ```jsx
-const [userDataList, setUserDataList] = useState("我需要在页面上实时显示");
-const userRef = useRef("我不需要再页面上实时显示");
+const [userDataList, setUserDataList] = useState('我需要在页面上实时显示');
+const userRef = useRef('我不需要再页面上实时显示');
 ```
 
 # javascript 规范
 
 ## 常量
 
-1. 常量命名全部大写，单词间用下划线隔开 **(不包含api)**
+1. 常量命名全部大写，单词间用下划线隔开 **(不包含 api)**
 2. 页面展示的如平台标题，通用的提示可以写入到 constants 文件中方便统一修改
 
 ## 变量
@@ -153,7 +167,7 @@ const array1 = [1, 2, ...array];
 // bad
 const obj = {
   a: 1,
-  b: 2
+  b: 2,
 };
 
 // good
@@ -187,4 +201,3 @@ const foo = function (name: string, midday: string) {};
 ## 注释
 
 1. 建议多加注释
-

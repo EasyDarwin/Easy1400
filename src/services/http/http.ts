@@ -98,7 +98,7 @@ export function setToken(token: string, id: number) {
 }
 
 service.interceptors.request.use((config) => {
-  config.headers!['Content-Type'] = 'application/json';
+  // config.headers!['Content-Type'] = 'application/json';
   const token: string = getToken();
   config.headers!['authorization'] = `Bearer ${token}`;
   return config;
@@ -110,6 +110,7 @@ async function request<T>(
   data?: object,
   // cancelToken?: CancelToken,
   signal?: GenericAbortSignal,
+  headers?: { [key: string]: string },
 ) {
   return await service.request<T>({
     url,
@@ -118,6 +119,7 @@ async function request<T>(
     params: method == 'GET' ? data : {},
     // cancelToken: cancelToken,
     signal: signal,
+    headers: headers,
   });
 }
 // 查询
@@ -141,8 +143,13 @@ export async function PUT<T>(url: string, params?: any) {
 }
 
 // 删除
-export async function DELETE<T>(url: string, params?: any) {
-  return request<T>(url, 'DELETE', params);
+export async function DELETE<T>(
+  url: string,
+  params?: any,
+  signal?: GenericAbortSignal | undefined,
+  headers?: { [key: string]: string },
+) {
+  return request<T>(url, 'DELETE', params, signal, headers);
 }
 
 // ErrorHandle 仅处理 400 错误，此错误为业务逻辑相关错误

@@ -12,20 +12,52 @@ export default defineConfig({
       layout: false,
     },
     {
-      name: '设备',
+      name: '采集设备',
       path: '/devices',
       component: 'device/view',
     },
     {
-      name: '图库',
+      name: '内容图库',
       path: '/gallery',
       component: 'gallery/view',
     },
     {
-      name: '级联',
+      name: '向上级联',
       path: '/cascade',
       component: 'cascade/view',
     },
+    {
+      name:'上级布控',
+      path: '/cascade/dispositions',
+      component:'cascade/dispositions/view',
+      hideInMenu: true,
+    },
+    {
+      name:'上级订阅',
+      path: '/cascade/subscribes',
+      component:'cascade/subscribes/view',
+      hideInMenu: true,
+    },
+    {
+      name: '系统设置',
+      path: '/system',
+      routes:[
+        {
+          path: '/system',
+          redirect: '/system/dicts',
+        },
+        {
+          path: '/system/dicts',
+          component: 'system/dict/view',
+          name: '字典管理',
+        },
+        {
+          name: '资源管理',
+          path: '/system/resource',
+          component: 'system/resource/view',
+        },
+      ]
+    }, 
   ],
   antd: {},
   reactQuery: {},
