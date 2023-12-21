@@ -26,6 +26,8 @@ export async function FindDispositions(data:Cascade.DispositionsListReq) {
 
 //>>>>>> 订阅  <<<<<
 export const findSubscribes = 'FindSubscribes'
-export async function FindSubscribes(data:Cascade.Pager) {
+export async function FindSubscribes(data:Cascade.DispositionsListReq) {
     return await GET(`/VIID/Subscribes`,data)
 }
+
+//删除订阅

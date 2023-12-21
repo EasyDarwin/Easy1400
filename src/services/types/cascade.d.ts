@@ -57,8 +57,33 @@ declare namespace Cascade {
   };
 
   type DispositionsListReq = {
-    MaxNumRecordReturn: string;
     PageRecordNum: number;
     RecordStartNo: number;
+    up_id?: string;
+  };
+
+  type DispositionsListRes = {
+    SubscribeObject: SubscribeObject[];
+    TotalNum: number;
+  };
+
+  type SubscribeObject = {
+    ApplicantName?: string;
+    ApplicantOrg?: string;
+    BeginTime?: string;
+    CancelReason?: string;
+    CancelTime?: string;
+    EndTime?: string;
+    OperateType?: number;
+    Reason?: string;
+    ReceiveAddr?: string;
+    ReportInterval?: number;
+    ResourceURI?: string;
+    SubscribeCancelOrg?: string;
+    SubscribeCancelPerson?: string;
+    SubscribeDetail?: string;
+    SubscribeID: string;
+    SubscribeStatus?: number;
+    Title?: string;
   };
 }
