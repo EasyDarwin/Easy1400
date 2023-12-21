@@ -32,10 +32,12 @@ const DeviceFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
           ? v.MonitorDirection.split('/')
           : [];
         const positionType = v.PositionType ? v.PositionType.split('/') : [];
+        const functionType = v.FunctionType ? v.FunctionType.split('/') : [];
         form.setFieldsValue({
           ...v,
           MonitorDirection: monitorDirection,
           PositionType: positionType,
+          FunctionType: functionType
         });
       }
       setModalVisible(true);
@@ -61,6 +63,19 @@ const DeviceFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
     },
   );
 
+  //获取功能类型类型字典列表
+  const { data: functionTypeList } = useQuery<Dict.DataItem[]>(
+    ['positionType'],
+    () =>
+      FindDictDatas('FunctionType').then(
+        (res: AxiosResponse) => res.data.items,
+      ),
+    {
+      staleTime: CACHE_CLEAR_TIME,
+      onError: ErrorHandle,
+    },
+  );
+
   //获取水平方向字典列表
   const { data: hdirectionTypeList } = useQuery<Dict.DataItem[]>(
     ['hdirectionType'],
@@ -78,7 +93,7 @@ const DeviceFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
     onSuccess: () => {
       message.success('添加成功');
       queryClient.invalidateQueries([getDeviceList]);
-      handleCancel()
+      handleCancel();
     },
     onError: ErrorHandle,
   });
@@ -90,7 +105,7 @@ const DeviceFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
       onSuccess: (res) => {
         message.success('修改成功');
         queryClient.invalidateQueries([getDeviceList]);
-        handleCancel()
+        handleCancel();
       },
       onError: ErrorHandle,
     },
@@ -111,13 +126,15 @@ const DeviceFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
   const handleSubmit = (v: Device.APEObject) => {
     let positionType = '';
     let monitorDirection = '';
+    let functionType = ''
     if (v.PositionType) positionType = [...v.PositionType].join('/');
-    if (v.MonitorDirection)
-      monitorDirection = [...v.MonitorDirection].join('/');
+    if (v.MonitorDirection) monitorDirection = [...v.MonitorDirection].join('/');
+    if (v.FunctionType) functionType = [...v.FunctionType].join('/');
     const formattedValues = {
       ...v,
       PositionType: positionType,
       MonitorDirection: monitorDirection,
+      FunctionType: functionType,
     };
     if (isEdit) {
       editMutate({ id: v.ApeID, data: formattedValues });
@@ -131,7 +148,7 @@ const DeviceFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
     form.resetFields();
     setModalVisible(false);
     useIdName.current = false;
-  }
+  };
 
   return (
     <Modal
@@ -239,13 +256,26 @@ const DeviceFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
             >
               <Input placeholder="所属采集系统" />
             </Form.Item>
-
+            <Form.Item
+              labelAlign="right"
+              label="监视区域说明"
+              name="MonitorAreaDesc"
+            >
+              <Input placeholder="监视区域说明" />
+            </Form.Item>
             <Form.Item
               labelAlign="right"
               label="车辆抓拍方向"
               name="CapDirection"
             >
-              <Input placeholder="车辆抓拍方向" />
+              <Select
+                style={{ width: '100%' }}
+                placeholder="车辆抓拍方向"
+                options={[
+                  { label: '拍车头', value: 0 },
+                  { label: '拍车尾，兼容无视频卡口信息设备', value: 1 },
+                ]}
+              />
             </Form.Item>
             <Form.Item
               labelAlign="right"
@@ -263,15 +293,18 @@ const DeviceFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
                 }))}
               />
             </Form.Item>
-            <Form.Item
-              labelAlign="right"
-              label="监视区域说明"
-              name="MonitorAreaDesc"
-            >
-              <Input placeholder="监视区域说明" />
-            </Form.Item>
+
             <Form.Item labelAlign="right" label="功能类型" name="FunctionType">
-              <Input placeholder="功能类型" />
+              <Select
+                mode="multiple"
+                allowClear
+                style={{ width: '100%' }}
+                placeholder="功能类型"
+                options={functionTypeList?.map((item: Dict.DataItem) => ({
+                  label: item.label,
+                  value: item.value,
+                }))}
+              />
             </Form.Item>
             <Form.Item
               labelAlign="right"

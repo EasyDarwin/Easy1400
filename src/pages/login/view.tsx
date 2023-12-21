@@ -77,7 +77,7 @@ export default function Page() {
       <div className=" xl:w-[500px] xl:h-[600px] h-[550px] w-[350px] rounded-2xl absolute top-1/2 left-1/2  -translate-x-1/2 -translate-y-1/2 bg-white flex flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm ">
           <h2 className=" mt-8 text-center text-2xl font-bold tracking-wider leading-9 text-gray-900">
-            1400视图库管理系统
+            GA/T1400视图库管理系统
           </h2>
         </div>
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">

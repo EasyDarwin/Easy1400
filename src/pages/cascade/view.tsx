@@ -2,8 +2,8 @@ import { history, useMutation, useQuery } from '@umijs/max';
 import React, { useRef, useState } from 'react';
 
 import {
+  ApartmentOutlined,
   DeleteOutlined,
-  PaperClipOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
@@ -94,7 +94,7 @@ const View: React.FC = () => {
                 onClick={() => {
                   history.push(`/cascade/subscribes?device_id=${record.id}`);
                 }}
-                icon={<PaperClipOutlined />}
+                icon={<ApartmentOutlined />}
               />
             </Tooltip>
             <Tooltip title="删除">

@@ -56,6 +56,11 @@ export default defineConfig({
           path: '/system/resource',
           component: 'system/resource/view',
         },
+        {
+          name: '系统信息',
+          path: '/system/info',
+          component: 'system/info/view',
+        },
       ]
     }, 
   ],

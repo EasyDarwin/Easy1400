@@ -17,7 +17,7 @@ declare namespace Device {
   type APEObject = {
     ApeID: string;
     CapDirection: number;
-    FunctionType: string;
+    FunctionType: string | any;
     HeartbeatAt: string;
     IPAddr: string;
     IPV6Addr: string;
