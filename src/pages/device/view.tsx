@@ -1,6 +1,7 @@
 import {
   DeleteOutlined,
   EditOutlined,
+  FilterOutlined,
   PlusOutlined,
   UnorderedListOutlined,
 } from '@ant-design/icons';
@@ -27,6 +28,7 @@ import Box from '@/components/box/Box';
 import CopyBtn from '@/components/copy/CopyBtn';
 import { POLLING_TIME } from '@/constants/index';
 import DeviceFrom from './components/DeviceFrom';
+import QuantityFrom, { IQuantityFromProps } from './components/QuantityFrom';
 
 interface IDeviceFrom {
   setFieldsValue: (data?: Device.APEObject, isEdit?: boolean) => void;
@@ -34,7 +36,7 @@ interface IDeviceFrom {
 
 const View: React.FC = () => {
   const deviceFromRef = useRef<IDeviceFrom>();
-
+  const quantityFrom = useRef<IQuantityFromProps>();
   const columns: ColumnsType<Device.APEObject> = [
     {
       title: 'ID',
@@ -140,6 +142,14 @@ const View: React.FC = () => {
                 // loading={
                 //   record.ApeID == currentDeviceId && getDeviceInfoLoading
                 // }
+              />
+            </Tooltip>
+            <Tooltip title="最大采集数量">
+              <Button
+                icon={<FilterOutlined />}
+                onClick={() => {
+                  quantityFrom.current?.setFieldsValue(record.ApeID)
+                }}
               />
             </Tooltip>
             <Tooltip title="删除设备">
@@ -263,6 +273,7 @@ const View: React.FC = () => {
         />
       </Box>
       <DeviceFrom ref={deviceFromRef} />
+      <QuantityFrom ref={quantityFrom} />
     </PageContainer>
   );
 };

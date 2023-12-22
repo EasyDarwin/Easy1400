@@ -68,7 +68,7 @@ const CardBox: React.FC<ICardBoxProps> = ({
         ></Checkbox>
       )}
 
-      <div className="absolute bottom-0 right-0 z-20">
+      <div className="absolute bottom-0 right-0 z-10">
         <Popconfirm
           title="确定删除该图片"
           onConfirm={() => onClickDel(data[infoLableKey[0]])}

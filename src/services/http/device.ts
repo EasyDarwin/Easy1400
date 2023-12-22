@@ -29,3 +29,8 @@ export async function EditDevice(data: {
 }) {
   return await PUT(`/devices/${data.id}`, data.data);
 }
+
+//设置每天最大采集数量
+export async function EditMaxCollectNum(data: {id:string;max_count:number}){
+  return await PUT(`/devices/${data.id}/limit`, {max_count:data.max_count});
+}
