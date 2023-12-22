@@ -242,6 +242,7 @@ const View: React.FC = () => {
           rowKey={'ApeID'}
           key={'system_app_table_key'}
           // bordered
+
           columns={columns}
           dataSource={deviceData?.APEListObject.APEObject}
           pagination={{

@@ -63,7 +63,7 @@ export default function Page() {
   const { mutate: handleLogin, isLoading: loginLoading } = useMutation(Login, {
     onSuccess: (res: any) => {
       setToken(res.data.token, res.data.user.id);
-      history.push('/devices');
+      history.push('/home');
       welcomeMessage();
     },
     onError: (error) => {

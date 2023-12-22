@@ -6,7 +6,6 @@ import { Descriptions, DescriptionsProps } from 'antd';
 import { AxiosResponse } from 'axios';
 
 const View = () => {
-
   const { data, isLoading } = useQuery(
     ['info'],
     () => FindSystemInfo().then((res: AxiosResponse) => res.data),
@@ -19,29 +18,27 @@ const View = () => {
     {
       key: '1',
       label: '视图库用户名',
-      children: data.username,
+      children: data?.username ?? '',
     },
     {
       key: '2',
       label: '视图库密码',
-      children: data.password,
+      children: data?.password ?? '',
     },
     {
       key: '3',
       label: '服务器启动时间',
-      children: data.start_at,
+      children: data?.start_at ?? '',
     },
     {
       key: '4',
       label: '版本号',
-      children: data.version,
+      children: data?.version ?? '',
     },
   ];
 
- 
-
   return (
-    <Box style={{width:'600px'}}>
+    <Box style={{ width: '600px' }}>
       <Descriptions column={2} title="系统信息" items={items} />
     </Box>
   );
