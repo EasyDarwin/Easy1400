@@ -44,4 +44,24 @@ declare namespace System {
      */
     video: number;
   };
+
+  type SystemInfo = {
+    /**
+     * 平台密码，级联用的
+     */
+    password: string;
+    /**
+     * 启动时间，程序啥时候启动的?
+     */
+    start_at: string;
+    /**
+     * 平台用户名，级联用的
+     */
+    username: string;
+    /**
+     * 版本号
+     */
+    version: string;
+    [property: string]: any;
+}
 }

@@ -3,6 +3,7 @@ import React, { useRef, useState } from 'react';
 
 import {
   ApartmentOutlined,
+  BellOutlined,
   DeleteOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
@@ -95,6 +96,14 @@ const View: React.FC = () => {
                   history.push(`/cascade/subscribes?device_id=${record.id}`);
                 }}
                 icon={<ApartmentOutlined />}
+              />
+            </Tooltip>
+            <Tooltip title="通知记录">
+              <Button
+                onClick={() => {
+                  history.push(`/cascade/notification?device_id=${record.id}`);
+                }}
+                icon={<BellOutlined />}
               />
             </Tooltip>
             <Tooltip title="删除">

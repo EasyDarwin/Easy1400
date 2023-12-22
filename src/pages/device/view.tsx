@@ -223,7 +223,7 @@ const View: React.FC = () => {
   ];
 
   const funcSearchComponet: SearchComponent = {
-    placeholder: '请输入设备id',
+    placeholder: '请输入设备 ID',
     onSearch: (value: string) => {
       setPagination({ ...pagination, ApeID: value });
     },

@@ -31,3 +31,10 @@ export async function FindSubscribes(data:Cascade.DispositionsListReq) {
 }
 
 //删除订阅
+
+
+//>>>>>> 通知  <<<<<
+export const findNotifies = 'FindNotifies'
+export async function FindNotifies(data:Cascade.DispositionsListReq) {
+    return await GET<Cascade.NotifyListRes>(`/notifications`,data)
+}

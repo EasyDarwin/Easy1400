@@ -39,6 +39,12 @@ export default defineConfig({
       hideInMenu: true,
     },
     {
+      name:'通知记录',
+      path: '/cascade/notification',
+      component:'cascade/notification/view',
+      hideInMenu: true,
+    },
+    {
       name: '系统设置',
       path: '/system',
       routes:[

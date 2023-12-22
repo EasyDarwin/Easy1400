@@ -10,3 +10,8 @@ export async function FindConfigs() {
 export async function EditConfigs(data: System.EditConfigsReq) {
   return await PUT(`/system/configs`, data);
 }
+
+//系统信息
+export async function FindSystemInfo() {
+  return await GET<System.SystemInfo>(`/system/infos`);
+}

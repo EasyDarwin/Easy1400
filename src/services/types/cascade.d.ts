@@ -86,4 +86,35 @@ declare namespace Cascade {
     SubscribeStatus?: number;
     Title?: string;
   };
+
+
+  //通知
+  type NotifyListRes = { 
+      items: NotifyItem[];
+      total: number;
+  }
+
+  type NotifyItem = {
+    ext: Ext;
+    id: string;
+    info_ids: string;
+    result: string;
+    subscribe_id: string;
+    trigger_time: string;
+    try_count: number;
+    up_id: string;
+}
+
+type Ext = {
+  ExecuteOperation: number;
+  FaceObjectList?: Gallery.FindRes;
+  InfoIDs: string;
+  MotorVehicleObjectList: Gallery.MotorVehicleRes;
+  NotificationID: string;
+  PersonObjectList?: Gallery.PersonRes;
+  SubscribeID: string;
+  Title: string;
+  TriggerTime: string;
+}
+
 }

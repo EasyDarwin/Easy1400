@@ -18,7 +18,8 @@
     "axios": "^1.6.2",
     "copy-to-clipboard": "^3.3.3",
     "crypto-js": "^4.2.0",
-    "moment": "^2.29.4"
+    "moment": "^2.29.4",
+    "react-json-view": "^1.21.3"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.1",
