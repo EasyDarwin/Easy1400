@@ -75,6 +75,7 @@ const View: React.FC = () => {
         <CopyBtn value={text} title="口令" disabled={record.IsOnline === '1'} />
       ),
     },
+    
     {
       title: '状态',
       dataIndex: 'IsOnline',
@@ -111,6 +112,18 @@ const View: React.FC = () => {
       ),
     },
     {
+      title: '当前数量',
+      dataIndex: 'CurrentCount',
+      align: 'center',
+      width: 110,
+    },
+    {
+      title: '限制总数',
+      dataIndex: 'MaxCount',
+      align: 'center',
+      width: 110,
+    },
+    {
       title: 'IP',
       dataIndex: 'IPAddr',
       align: 'center',
@@ -121,7 +134,7 @@ const View: React.FC = () => {
       title: '操作',
       align: 'center',
       fixed: 'right',
-      width: 150,
+      width: 180,
       render: (text: string, record: Device.APEObject) => {
         return (
           <Space>
@@ -199,7 +212,7 @@ const View: React.FC = () => {
   });
 
   const [pagination, setPagination] = useState<Device.Pager>({
-    ApeID: '',
+    value: '',
     PageRecordNum: 10,
     RecordStartNo: 1,
   });
@@ -233,9 +246,9 @@ const View: React.FC = () => {
   ];
 
   const funcSearchComponet: SearchComponent = {
-    placeholder: '请输入设备 ID',
+    placeholder: '请输入设备 名称 或 ID',
     onSearch: (value: string) => {
-      setPagination({ ...pagination, ApeID: value });
+      setPagination({ ...pagination, value: value });
     },
   };
   return (
@@ -251,8 +264,7 @@ const View: React.FC = () => {
           loading={deviceListLoading}
           rowKey={'ApeID'}
           key={'system_app_table_key'}
-          // bordered
-
+          scroll={{ x: 1300 }}
           columns={columns}
           dataSource={deviceData?.APEListObject.APEObject}
           pagination={{

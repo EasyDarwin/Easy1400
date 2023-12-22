@@ -3,6 +3,7 @@ import React, { useRef, useState } from 'react';
 
 import {
   ApartmentOutlined,
+  ApiOutlined,
   BellOutlined,
   DeleteOutlined,
   PlusOutlined,
@@ -21,6 +22,7 @@ import {
 } from '@/services/http/cascade';
 import { ErrorHandle } from '@/services/http/http';
 import CascadeFrom, { ICascadeRef } from './components/CascadeFrom';
+import DeviceFrom, { IDeviceRef } from './components/DeviceFrom';
 
 const View: React.FC = () => {
   const columns: ColumnsType<Cascade.Item> = [
@@ -81,7 +83,7 @@ const View: React.FC = () => {
       title: '操作',
       align: 'center',
       fixed: 'right',
-      width: 130,
+      width: 180,
       render: (text: string, record: Cascade.Item) => {
         return (
           <Space>
@@ -104,6 +106,14 @@ const View: React.FC = () => {
                   history.push(`/cascade/notification?device_id=${record.id}`);
                 }}
                 icon={<BellOutlined />}
+              />
+            </Tooltip>
+            <Tooltip title="选择共享设备">
+              <Button
+                onClick={() => {
+                  deviceRef.current?.setFieldsValue({id:record.id,device_ids:record.device_ids || []});
+                }}
+                icon={<ApiOutlined />}
               />
             </Tooltip>
             <Tooltip title="删除">
@@ -147,6 +157,7 @@ const View: React.FC = () => {
     },
   ];
   const cascadeRef = useRef<ICascadeRef>();
+  const deviceRef = useRef<IDeviceRef>();
 
   const [loadings, setLoadings] = useState<string[]>([]);
   const { mutate: deleteCascadeMutate, isLoading: deleteCascadeLoading } =
@@ -195,6 +206,7 @@ const View: React.FC = () => {
           rowKey={'ApeID'}
           key={'system_app_table_key'}
           columns={columns}
+          scroll={{x:1300}}
           dataSource={cascadeData?.items}
           pagination={{
             total: cascadeData?.total,
@@ -208,6 +220,7 @@ const View: React.FC = () => {
         />
       </Box>
       <CascadeFrom ref={cascadeRef} />
+      <DeviceFrom ref={deviceRef} />
     </PageContainer>
   );
 };

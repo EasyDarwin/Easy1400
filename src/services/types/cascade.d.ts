@@ -27,6 +27,7 @@ declare namespace Cascade {
     port: number;
     status: string;
     username: string;
+    device_ids?:string[];
   };
 
   type AddReq = {

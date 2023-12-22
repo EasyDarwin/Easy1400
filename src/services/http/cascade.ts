@@ -16,6 +16,12 @@ export async function DelCascade(id:string) {
     return await DELETE(`/cascades/${id}`)
 }
 
+//选择设备
+export async function EditSelectDevice(data:{id:string;device_ids:string[]}) {
+    console.log(data);
+    
+    return await PUT(`/cascades/${data.id}/devices`,{device_ids:data.device_ids})
+}
 
 //>>>>> 布控  <<<<<
 export const findDispositions = 'FindDispositions'

@@ -2,7 +2,7 @@ declare namespace Device {
   type Pager = {
     PageRecordNum: number;
     RecordStartNo: number;
-    ApeID?: string;
+    value?: string;
   };
 
   type FindReq = {

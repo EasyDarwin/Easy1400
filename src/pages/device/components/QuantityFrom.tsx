@@ -42,7 +42,7 @@ const QuantityFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
       onOk={() => form.submit()}
       onCancel={handleCancel}
       destroyOnClose={true}
-      confirmLoading={false}
+      confirmLoading={isLoading}
     >
       <Form
         form={form}
