@@ -67,34 +67,34 @@ const View: React.FC = () => {
         setCurrentPageKey(findNonMotorVehicles);
       },
     },
-    {
-      label: '物品',
-      loading: false,
-      type: 'primary',
-      disabled: true,
-      onClick: () => {},
-    },
-    {
-      label: '图像',
-      loading: false,
-      type: 'primary',
-      disabled: true,
-      onClick: () => {},
-    },
-    {
-      label: '视频片段',
-      loading: false,
-      type: 'primary',
-      disabled: true,
-      onClick: () => {},
-    },
-    {
-      label: '文件',
-      loading: false,
-      type: 'primary',
-      disabled: true,
-      onClick: () => {},
-    },
+    // {
+    //   label: '物品',
+    //   loading: false,
+    //   type: 'primary',
+    //   disabled: true,
+    //   onClick: () => {},
+    // },
+    // {
+    //   label: '图像',
+    //   loading: false,
+    //   type: 'primary',
+    //   disabled: true,
+    //   onClick: () => {},
+    // },
+    // {
+    //   label: '视频片段',
+    //   loading: false,
+    //   type: 'primary',
+    //   disabled: true,
+    //   onClick: () => {},
+    // },
+    // {
+    //   label: '文件',
+    //   loading: false,
+    //   type: 'primary',
+    //   disabled: true,
+    //   onClick: () => {},
+    // },
   ];
 
   //工具栏按钮

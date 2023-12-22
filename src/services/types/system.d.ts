@@ -63,5 +63,14 @@ declare namespace System {
      */
     version: string;
     [property: string]: any;
-}
+  };
+
+  type Statistics = {
+    items: StatisticsItem[];
+  };
+  type StatisticsItem = {
+    count: number;
+    tag: string;
+    title: string;
+  };
 }

@@ -72,8 +72,6 @@ const CardBox: React.FC<ICardBoxProps> = ({
         <Card
           className="w-52"
           actions={[
-            <SettingOutlined key="setting" />,
-            <EditOutlined key="edit" />,
             <Popconfirm
               key="delete"
               title="确定删除该图片"

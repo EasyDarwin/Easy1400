@@ -1,42 +1,28 @@
 import Box from '@/components/box/Box';
+import { ErrorHandle } from '@/services/http/http';
+import { FindStatistics } from '@/services/http/system';
 import { Column } from '@ant-design/charts';
 import { PageContainer } from '@ant-design/pro-components';
+import { useQuery } from '@umijs/max';
+import { DatePicker, DatePickerProps } from 'antd';
+import { AxiosResponse } from 'axios';
+import { useState } from 'react';
 
 export default function Page() {
-  const data = [
+  const [query, setQuery] = useState({
+    start: 0,
+    end: 0,
+    device_id: '',
+  });
+
+  const { data: statisticsData, isLoading } = useQuery<System.Statistics>(
+    ['statistics', query],
+    () => FindStatistics(query).then((res: AxiosResponse) => res.data),
     {
-      type: '家具家电',
-      sales: 38,
+      onError: ErrorHandle,
     },
-    {
-      type: '粮油副食',
-      sales: 52,
-    },
-    {
-      type: '生鲜水果',
-      sales: 61,
-    },
-    {
-      type: '美容洗护',
-      sales: 145,
-    },
-    {
-      type: '母婴用品',
-      sales: 48,
-    },
-    {
-      type: '进口食品',
-      sales: 38,
-    },
-    {
-      type: '食品饮料',
-      sales: 38,
-    },
-    {
-      type: '家庭清洁',
-      sales: 38,
-    },
-  ];
+  );
+
   const config = {
     title: {
       visible: true,
@@ -47,13 +33,13 @@ export default function Page() {
       text: '基础柱状图图形标签默认位置在柱形上部\u3002',
     },
     forceFit: true,
-    data,
+    data: statisticsData?.items ?? [],
     padding: 'auto',
-    xField: 'type',
-    yField: 'sales',
-    meta: {
-      type: { alias: '类别' },
-      sales: { alias: '销售额(万)' },
+    xField: 'title',
+    yField: 'count',
+
+    style: {
+      maxWidth: 80,
     },
     label: {
       visible: true,
@@ -65,13 +51,23 @@ export default function Page() {
       },
     },
   };
+
+  const onChange: DatePickerProps['onChange'] = (date, dateString) => {
+    console.log(date, dateString);
+  };
+
   return (
     <PageContainer>
-      <div style={{ maxWidth: '600px' }}>
-        <Box>
-          <Column {...config} />
-        </Box>
-      </div>
+      {/* <Box>
+        <DatePicker.RangePicker
+          showTime={{ format: 'HH:mm' }}
+          format="YYYY-MM-DD HH:mm"
+          onChange={onChange}
+        />
+      </Box> */}
+      <Box style={{ width: '700px' }}>
+        <Column {...config} />
+      </Box>
     </PageContainer>
   );
 }

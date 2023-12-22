@@ -15,3 +15,8 @@ export async function EditConfigs(data: System.EditConfigsReq) {
 export async function FindSystemInfo() {
   return await GET<System.SystemInfo>(`/system/infos`);
 }
+
+//采集数据统计
+export async function FindStatistics(data:any) {
+  return await GET<System.Statistics>(`/system/statistics`,data);
+}

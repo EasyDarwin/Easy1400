@@ -46,6 +46,7 @@ const Dispositions: React.FC = () => {
       title: '通知结果',
       dataIndex: 'result',
       align: 'center',
+      render:(text:string)=> (<span className={text == 'OK' ? 'text-green-500' :''}>{text}</span>)
     },
     {
       title: '通知时间',
