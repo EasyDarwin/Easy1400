@@ -1,0 +1,5 @@
+.grid-fill {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 13rem);
+  justify-content: space-between;
+}

@@ -1,4 +1,4 @@
-import { Divider, Empty, Flex, Pagination, Spin, message } from 'antd';
+import { Divider, Empty, Pagination, Spin, message } from 'antd';
 import { useContext, useState } from 'react';
 
 import { DelFace, DelFaces, FindFace, findFace } from '@/services/http/gallery';
@@ -6,6 +6,7 @@ import { ErrorHandle } from '@/services/http/http';
 import { useMutation, useQuery, useQueryClient } from '@umijs/max';
 import { AxiosResponse } from 'axios';
 
+import '../index.less';
 import CardBox from './CardBox';
 import SelectControl from './SelectControl';
 import SharedDataContext from './SharedDataContext';
@@ -88,22 +89,22 @@ const Face: React.FC = () => {
     },
     onError: ErrorHandle,
   });
-
   return (
     <div>
-      <SelectControl
-        isLoading={delFacesLoading}
-        openCheckbox={openCheckbox}
-        confirm={() => {
-          delMutates(checkList.join());
-        }}
-        cancel={() => {}}
-        onCheckAll={onCheckAll}
-        onCheckReverse={onCheckReverse}
-        onOpenCheckbox={onOpenCheckbox}
-      />
       <Spin spinning={galleryLoading}>
-        <Flex wrap="wrap" gap="small">
+        <SelectControl
+          isLoading={delFacesLoading}
+          openCheckbox={openCheckbox}
+          confirm={() => {
+            delMutates(checkList.join());
+          }}
+          cancel={() => {}}
+          onCheckAll={onCheckAll}
+          onCheckReverse={onCheckReverse}
+          onOpenCheckbox={onOpenCheckbox}
+        />
+
+        <div className="grid-fill">
           {galleryList?.FaceListObject.FaceObject.length ? (
             galleryList?.FaceListObject.FaceObject.map(
               (item: Gallery.FaceObject) => (
@@ -124,9 +125,8 @@ const Face: React.FC = () => {
               image={Empty.PRESENTED_IMAGE_SIMPLE}
             />
           )}
-        </Flex>
-
-        <Divider className='mb-3'/>
+        </div>
+        <Divider className="mb-3" />
 
         <div className="flex justify-end">
           <Pagination

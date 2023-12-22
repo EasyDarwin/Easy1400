@@ -5,7 +5,9 @@ import { Column } from '@ant-design/charts';
 import { PageContainer } from '@ant-design/pro-components';
 import { useQuery } from '@umijs/max';
 import { DatePicker, DatePickerProps } from 'antd';
+import { RangePickerProps } from 'antd/es/date-picker';
 import { AxiosResponse } from 'axios';
+import moment from 'moment';
 import { useState } from 'react';
 
 export default function Page() {
@@ -52,19 +54,26 @@ export default function Page() {
     },
   };
 
-  const onChange: DatePickerProps['onChange'] = (date, dateString) => {
-    console.log(date, dateString);
+  const handleRangePickerChange = (
+    dates: DatePickerProps['value'] | RangePickerProps['value'],
+    dateStrings: [string, string] | string,
+  ) => {
+    if (dateStrings.length === 2 && dates && dateStrings[0] !== dateStrings[1]) {
+      const [startStr, endStr] = dateStrings;
+      const startTimestamp = Math.floor(moment(startStr).valueOf() / 1000);
+      const endTimestamp = Math.floor(moment(endStr).valueOf() / 1000);
+      setQuery({ ...query, start: startTimestamp, end: endTimestamp });
+    }
   };
 
   return (
     <PageContainer>
-      {/* <Box>
+      <Box style={{ width: '700px' }}>
         <DatePicker.RangePicker
-          showTime={{ format: 'HH:mm' }}
-          format="YYYY-MM-DD HH:mm"
-          onChange={onChange}
+          format="YYYY-MM-DD"
+          onChange={handleRangePickerChange}
         />
-      </Box> */}
+      </Box>
       <Box style={{ width: '700px' }}>
         <Column {...config} />
       </Box>

@@ -1,11 +1,15 @@
 import { shortenString } from '@/package/string/string';
 import { timeToFormatTime } from '@/package/time/time';
+import { DeleteOutlined } from '@ant-design/icons';
 import {
-  DeleteOutlined,
-  EditOutlined,
-  SettingOutlined,
-} from '@ant-design/icons';
-import { Badge, Card, Checkbox, Image, Popconfirm, Tooltip } from 'antd';
+  Badge,
+  Button,
+  Card,
+  Checkbox,
+  Image,
+  Popconfirm,
+  Tooltip,
+} from 'antd';
 import React, { useContext, useRef, useState } from 'react';
 import SharedDataContext from './SharedDataContext';
 
@@ -55,7 +59,7 @@ const CardBox: React.FC<ICardBoxProps> = ({
   };
 
   return (
-    <div className="mx-1 relative">
+    <div className="my-2 relative">
       {showCheck && (
         <Checkbox
           className="absolute left-2 top-1 z-20"
@@ -63,6 +67,19 @@ const CardBox: React.FC<ICardBoxProps> = ({
           checked={checkList?.includes(data[infoLableKey[0]])}
         ></Checkbox>
       )}
+
+      <div className="absolute bottom-0 right-0 z-20">
+        <Popconfirm
+          title="确定删除该图片"
+          onConfirm={() => onClickDel(data[infoLableKey[0]])}
+          onCancel={() => {}}
+          okText="确定"
+          cancelText="取消"
+        >
+          <Button shape="circle" style={{border:'none'}} danger icon={<DeleteOutlined />} />
+        </Popconfirm>
+      </div>
+
       <Badge
         style={{ boxShadow: 'none' }}
         color="#999"
@@ -71,18 +88,6 @@ const CardBox: React.FC<ICardBoxProps> = ({
       >
         <Card
           className="w-52"
-          actions={[
-            <Popconfirm
-              key="delete"
-              title="确定删除该图片"
-              onConfirm={() => onClickDel(data[infoLableKey[0]])}
-              onCancel={() => {}}
-              okText="确定"
-              cancelText="取消"
-            >
-              <DeleteOutlined style={{ color: '#f5222d' }} />
-            </Popconfirm>,
-          ]}
           hoverable
           // onClick={onClickImage}
           cover={
@@ -102,8 +107,9 @@ const CardBox: React.FC<ICardBoxProps> = ({
                   onVisibleChange: (value) => {
                     setVisible(value);
                   },
-                  onChange: (current, prev) => setConver({...cover,index:current}),
-                  current:cover.index
+                  onChange: (current, prev) =>
+                    setConver({ ...cover, index: current }),
+                  current: cover.index,
                 }}
                 items={imageList.current}
               />

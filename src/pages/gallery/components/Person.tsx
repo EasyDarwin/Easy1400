@@ -6,7 +6,7 @@ import {
 } from '@/services/http/gallery';
 import { ErrorHandle } from '@/services/http/http';
 import { useMutation, useQuery, useQueryClient } from '@umijs/max';
-import { Divider, Empty, Flex, Pagination, Spin, message } from 'antd';
+import { Divider, Empty, Pagination, Spin, message } from 'antd';
 import { AxiosResponse } from 'axios';
 import { useContext, useState } from 'react';
 import CardBox from './CardBox';
@@ -108,28 +108,30 @@ const Person: React.FC = () => {
         onOpenCheckbox={onOpenCheckbox}
       />
       <Spin spinning={galleryLoading}>
-        <Flex wrap="wrap" gap="small">
-          {galleryList?.PersonListObject.PersonObject.length ? (
-            galleryList?.PersonListObject.PersonObject.map(
-              (item: Gallery.PersonObject) => (
-                <CardBox
-                  key={item.PersonID}
-                  showCheck={openCheckbox}
-                  checkList={checkList}
-                  data={item}
-                  infoLableKey={['PersonID', 'PersonAppearTime']}
-                  onCheck={onCheck}
-                  onClickDel={delMutate}
-                />
-              ),
-            )
-          ) : (
-            <Empty
-              style={{ width: '100%', height: '100%' }}
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-            />
-          )}
-        </Flex>
+        <div className="px-6">
+          <div className="grid-fill">
+            {galleryList?.PersonListObject.PersonObject.length ? (
+              galleryList?.PersonListObject.PersonObject.map(
+                (item: Gallery.PersonObject) => (
+                  <CardBox
+                    key={item.PersonID}
+                    showCheck={openCheckbox}
+                    checkList={checkList}
+                    data={item}
+                    infoLableKey={['PersonID', 'PersonAppearTime']}
+                    onCheck={onCheck}
+                    onClickDel={delMutate}
+                  />
+                ),
+              )
+            ) : (
+              <Empty
+                style={{ width: '100%', height: '100%' }}
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+              />
+            )}
+          </div>
+        </div>
 
         <Divider className="mb-3" />
 
