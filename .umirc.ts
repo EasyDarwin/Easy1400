@@ -72,6 +72,11 @@ export default defineConfig({
           path: '/system/info',
           component: 'system/info/view',
         },
+        {
+          name: '定时任务',
+          path: '/system/cron',
+          component: 'system/cron/view',
+        },
       ],
     },
   ],

@@ -33,7 +33,7 @@ build/linux:
 build:
 	@sed -i "" "s/WEB_VERSION: '0.0.1'/WEB_VERSION: '${VERSION}-$(HASH_AND_DATE)'/" .umirc.ts
 	@yarn build
-	# @git checkout .umirc.ts
+	@git checkout .umirc.ts
 
 push:
 	@tar -zcvf dist.tar.gz ./dist
