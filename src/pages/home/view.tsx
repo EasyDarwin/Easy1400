@@ -1,13 +1,28 @@
 import Box from '@/components/box/Box';
+import CopyIcon from '@/components/copy/CopyIcon';
+import { onCopyValue } from '@/package/copy/copy';
+import { datePickerToTimestamp } from '@/package/time/time';
 import { ErrorHandle } from '@/services/http/http';
-import { FindStatistics } from '@/services/http/system';
+import {
+  FindStatistics,
+  FindSystemInfo,
+  findSystemInfo,
+} from '@/services/http/system';
 import { Column } from '@ant-design/charts';
 import { PageContainer } from '@ant-design/pro-components';
 import { useQuery } from '@umijs/max';
-import { DatePicker, DatePickerProps } from 'antd';
+import {
+  Button,
+  DatePicker,
+  DatePickerProps,
+  Descriptions,
+  DescriptionsProps,
+  Typography,
+} from 'antd';
+
 import { RangePickerProps } from 'antd/es/date-picker';
 import { AxiosResponse } from 'axios';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { useState } from 'react';
 
 export default function Page() {
@@ -25,6 +40,78 @@ export default function Page() {
     },
   );
 
+  const { data: infoData, isLoading: infoLoading } =
+    useQuery<System.SystemInfo>(
+      [findSystemInfo],
+      () => FindSystemInfo().then((res: AxiosResponse) => res.data),
+      {
+        onError: ErrorHandle,
+      },
+    );
+
+  const items: DescriptionsProps['items'] = [
+    {
+      key: '1',
+      label: '视图库用户名',
+      children: (
+        <span>
+          {infoData?.username ?? ''}
+          <CopyIcon value={infoData?.username ?? ''} />
+        </span>
+      ),
+    },
+    {
+      key: '2',
+      label: '视图库密码',
+      children: (
+        <span>
+          {infoData?.password ?? ''}
+          <CopyIcon value={infoData?.password ?? ''} />
+        </span>
+      ),
+    },
+    {
+      key: '3',
+      label: '服务器启动时间',
+      children: (
+        <span>
+          {infoData?.start_at ?? ''}
+          <CopyIcon value={infoData?.start_at ?? ''} />
+        </span>
+      ),
+    },
+    {
+      key: '4',
+      label: '版本号',
+      children: (
+        <span>
+          {infoData?.version ?? ''}
+          <CopyIcon value={infoData?.version ?? ''} />
+        </span>
+      ),
+    },
+    {
+      key: '5',
+      label: '服务器地址',
+      children: (
+        <span>
+          {infoData?.host ?? ''}
+          <CopyIcon value={infoData?.host ?? ''} />
+        </span>
+      ),
+    },
+    {
+      key: '6',
+      label: '服务器端口',
+      children: (
+        <span>
+          {infoData?.port ?? ''}
+          <CopyIcon value={infoData?.port ?? ''} />
+        </span>
+      ),
+    },
+  ];
+
   const config = {
     title: {
       visible: true,
@@ -41,42 +128,58 @@ export default function Page() {
     yField: 'count',
 
     style: {
-      maxWidth: 80,
+      maxWidth: 40,
     },
     label: {
       visible: true,
       style: {
         fill: '#0D0E68',
         fontSize: 12,
-        fontWeight: 600,
+        maxWidth: 80,
         opacity: 0.6,
       },
     },
   };
 
-  const handleRangePickerChange = (
-    dates: DatePickerProps['value'] | RangePickerProps['value'],
-    dateStrings: [string, string] | string,
+  const onOk = (
+    value: DatePickerProps['value'] | RangePickerProps['value'],
   ) => {
-    if (dateStrings.length === 2 && dates && dateStrings[0] !== dateStrings[1]) {
-      const [startStr, endStr] = dateStrings;
-      const startTimestamp = Math.floor(moment(startStr).valueOf() / 1000);
-      const endTimestamp = Math.floor(moment(endStr).valueOf() / 1000);
-      setQuery({ ...query, start: startTimestamp, end: endTimestamp });
+    if (Array.isArray(value) && value.length === 2) {
+      const time = datePickerToTimestamp(value)
+        setQuery({ ...query, start: time?.start ?? 0, end: time?.end ?? 0 });
     }
   };
 
+  //一键复制信息
+  const onClickCopyInfo = () =>{
+    let data = {
+      platform_id: infoData?.username ?? '',
+      user_name: infoData?.username ?? '',
+      remote_port: Number(infoData?.port ?? 0),
+    };
+    onCopyValue(JSON.stringify(data))
+  }
+
   return (
     <PageContainer>
-      <Box style={{ width: '700px' }}>
+      <Box style={{ width: '500px' }}>
         <DatePicker.RangePicker
-          format="YYYY-MM-DD"
-          onChange={handleRangePickerChange}
+          showTime
+          format="YYYY-MM-DD HH:mm"
+          defaultValue={[dayjs().startOf('day'), dayjs().endOf('day')]}
+          onOk={onOk}
         />
       </Box>
-      <Box style={{ width: '700px' }}>
-        <Column {...config} />
-      </Box>
+      <div className="flex">
+        <Box style={{ width: '500px' }}>
+          <Typography.Title level={5}>资源采集数量</Typography.Title>
+          <Column {...config} />
+        </Box>
+        <Box style={{ width: '600px', marginLeft: '22px' }}>
+          <Descriptions column={2} title="系统信息" items={items} />
+          <Button onClick={onClickCopyInfo}>一键复制</Button>
+        </Box>
+      </div>
     </PageContainer>
   );
 }

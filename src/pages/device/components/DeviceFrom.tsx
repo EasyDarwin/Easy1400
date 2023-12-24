@@ -23,6 +23,7 @@ import { FindDictDatas } from '@/services/http/dict';
 import { ErrorHandle } from '@/services/http/http';
 import { useQuery } from '@umijs/max';
 import { AxiosResponse } from 'axios';
+import { FindSystemInfo, findSystemInfo } from '@/services/http/system';
 
 const DeviceFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
   useImperativeHandle(ref, () => ({
@@ -37,7 +38,7 @@ const DeviceFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
           ...v,
           MonitorDirection: monitorDirection,
           PositionType: positionType,
-          FunctionType: functionType
+          FunctionType: functionType,
         });
       }
       setModalVisible(true);
@@ -78,7 +79,7 @@ const DeviceFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
 
   //获取水平方向字典列表
   const { data: hdirectionTypeList } = useQuery<Dict.DataItem[]>(
-    ['hdirectionType'],
+    ['hdirectionTypes'],
     () =>
       FindDictDatas('HDirectionType').then(
         (res: AxiosResponse) => res.data.items,
@@ -111,6 +112,7 @@ const DeviceFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
     },
   );
 
+
   //默认username跟随id，但是如果username有值就不跟随
   const useIdName = useRef<boolean>(false);
   const handleDeviceIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -126,9 +128,10 @@ const DeviceFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
   const handleSubmit = (v: Device.APEObject) => {
     let positionType = '';
     let monitorDirection = '';
-    let functionType = ''
+    let functionType = '';
     if (v.PositionType) positionType = [...v.PositionType].join('/');
-    if (v.MonitorDirection) monitorDirection = [...v.MonitorDirection].join('/');
+    if (v.MonitorDirection)
+      monitorDirection = [...v.MonitorDirection].join('/');
     if (v.FunctionType) functionType = [...v.FunctionType].join('/');
     const formattedValues = {
       ...v,
@@ -148,6 +151,17 @@ const DeviceFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
     form.resetFields();
     setModalVisible(false);
     useIdName.current = false;
+  };
+
+  //校验 验证code第11~13位必须为503
+  const validateCode = (_: any, value: string) => {
+    if (value.length !== 20) {
+      return Promise.reject(new Error('ID长度必须为20'));
+    }
+    if (value && value.substring(10, 13) !== '119') {
+      return Promise.reject(new Error('第11~13位必须为119'));
+    }
+    return Promise.resolve();
   };
 
   return (
@@ -174,7 +188,7 @@ const DeviceFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
               labelAlign="right"
               label="设备 ID"
               name="ApeID"
-              rules={[{ required: true }]}
+              rules={[{ required: true }, { validator: validateCode }]}
             >
               <Input
                 maxLength={20}

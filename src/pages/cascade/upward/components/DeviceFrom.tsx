@@ -1,9 +1,8 @@
-import { POLLING_TIME } from '@/constants';
-import { EditSelectDevice } from '@/services/http/cascade';
+import { EditSelectDevice, getCascades } from '@/services/http/cascade';
 import { FindDeviceLists, getDeviceList } from '@/services/http/device';
 import { ErrorHandle } from '@/services/http/http';
 import { useMutation, useQuery, useQueryClient } from '@umijs/max';
-import { Form, Input, Modal, Transfer, message } from 'antd';
+import { Form, Input, Modal, Transfer, Typography, message } from 'antd';
 import { TransferDirection } from 'antd/es/transfer';
 import { AxiosResponse } from 'axios';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
@@ -35,16 +34,12 @@ const CascadeFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
 
   const [pagination, setPagination] = useState<Device.Pager>({
     value: '',
-    PageRecordNum: 3000,
+    PageRecordNum: 9999,
     RecordStartNo: 1,
   });
 
   //获取设备列表
-  const {
-    data: deviceData,
-    isLoading: deviceListLoading,
-    refetch,
-  } = useQuery<Device.FindReq>(
+  const {} = useQuery<Device.FindReq>(
     [getDeviceList, pagination],
     () =>
       FindDeviceLists({ ...pagination }).then(
@@ -64,17 +59,31 @@ const CascadeFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
       ),
     {
       onError: ErrorHandle,
-      refetchInterval: POLLING_TIME,
     },
   );
 
-  const { mutate } = useMutation(EditSelectDevice, {
+  const { mutate, isLoading: editIsLoading } = useMutation(EditSelectDevice, {
     onSuccess: () => {
       message.success('设置成功');
+      queryClient.invalidateQueries([getCascades]);
       handleClose();
     },
-    onError: () => {},
+    onError: ErrorHandle,
   });
+
+  const onChange = (
+    newTargetKeys: string[],
+    direction: TransferDirection,
+    moveKeys: string[],
+  ) => {
+    // console.log(newTargetKeys, direction, moveKeys);
+    setTargetKeys(newTargetKeys);
+  };
+
+  //搜索
+  const handleSearch = (dir: TransferDirection, value: string) => {
+    console.log('search:', dir, value);
+  };
 
   //关闭表单
   const handleClose = () => {
@@ -82,24 +91,16 @@ const CascadeFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
     setModalVisible(false);
   };
 
-  const onChange = (
-    newTargetKeys: string[],
-    direction: TransferDirection,
-    moveKeys: string[],
-  ) => {
-    console.log(newTargetKeys, direction, moveKeys);
-    setTargetKeys(newTargetKeys);
-  };
-
   return (
     <Modal
-      title="选择共享设备及对象"
+      title="限制共享设备"
       centered
       open={modalVisible}
       onOk={() => form.submit()}
       onCancel={handleClose}
       destroyOnClose={true}
-      confirmLoading={false}
+      confirmLoading={editIsLoading}
+      width="50%"
     >
       <Form
         form={form}
@@ -109,14 +110,22 @@ const CascadeFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
           mutate(v);
         }}
       >
-        <Form.Item name="device_ids" className='flex justify-center my-6'>
+        <Form.Item name="device_ids" className="flex justify-center my-4">
           <Transfer
             dataSource={mockData}
             targetKeys={targetKeys}
+            showSearch
+            titles={['共享设备', '限制设备']}
+            onSearch={handleSearch}
+            listStyle={{
+              width: 500,
+              height: 400,
+            }}
             onChange={onChange}
             render={(item) => item.title}
           />
         </Form.Item>
+        <Typography.Text type="secondary">默认共享所有设备</Typography.Text>
         <Form.Item label="ID" name="id" hidden>
           <Input placeholder="上级视图库ID" />
         </Form.Item>

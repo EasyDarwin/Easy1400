@@ -1,7 +1,6 @@
-import Box from '@/components/box/Box';
-import { Button, Col, Row } from 'antd';
+import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
+import { Button, Col, Row, Upload, UploadProps } from 'antd';
 
-import Search from 'antd/es/input/Search';
 import React, { useState } from 'react';
 
 export interface ButtonList {
@@ -14,55 +13,64 @@ export interface ButtonList {
   onClick: () => void;
 }
 
-export interface SearchComponent {
+export interface ISearchComponent {
   placeholder: string;
   onSearch: (value: string) => void;
 }
 
+export interface IUploadProps {props:UploadProps,title:string;isLoading:boolean;}
+
 interface IFunctionBarPorps {
   btnChannle: ButtonList[];
-  searchChannle?: SearchComponent;
+  rigthChannle?: React.ReactNode;
+  span?: [number, number];
+  rigthChannleClass?: string;
+  isBar?: boolean; //是否开启单选模式
+  uploadProps?: IUploadProps;
+  isUpload?: boolean; //是否开启上传模式
 }
 
 const FunctionBar: React.FC<IFunctionBarPorps> = ({
   btnChannle,
-  searchChannle,
+  rigthChannle,
+  span = [12, 12],
+  rigthChannleClass,
+  isBar = true,
+  uploadProps,
+  isUpload = false,
 }) => {
   const [selectedID, setSelectedID] = useState(0);
 
-
   return (
     <>
-      <Row className="w-full bg-white" justify="space-between">
-        <Col>
+      <Row className="w-full bg-white">
+        <Col span={span[0]}>
           <Button.Group>
             {btnChannle.map((button, index) => (
               <Button
                 key={index}
                 loading={button.loading}
-                onClick={()=>{
+                onClick={() => {
                   setSelectedID(index);
-                  button.onClick()
+                  button.onClick();
                 }}
                 color={button.color}
                 icon={button.icon}
-                type={selectedID == index ? button.type : "default"}
+                type={selectedID == index || isBar ? button.type : 'default'}
                 disabled={button.disabled}
               >
                 {button.label}
               </Button>
             ))}
+            {isUpload && (
+              <Upload {...uploadProps?.props}>
+                <Button className='rounded-l-none' type='primary' loading={uploadProps?.isLoading} icon={<DownloadOutlined />}>{uploadProps?.title}</Button>
+              </Upload>
+            )}
           </Button.Group>
         </Col>
-        <Col>
-          {searchChannle && (
-            <Search
-              className="w-96"
-              enterButton
-              placeholder={searchChannle.placeholder}
-              onSearch={searchChannle.onSearch}
-            />
-          )}
+        <Col span={span[1]} className={rigthChannleClass}>
+          {rigthChannle}
         </Col>
       </Row>
     </>

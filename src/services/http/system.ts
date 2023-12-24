@@ -12,6 +12,7 @@ export async function EditConfigs(data: System.EditConfigsReq) {
 }
 
 //系统信息
+export const findSystemInfo = 'FindSystemInfo';
 export async function FindSystemInfo() {
   return await GET<System.SystemInfo>(`/system/infos`);
 }
@@ -20,3 +21,4 @@ export async function FindSystemInfo() {
 export async function FindStatistics(data:any) {
   return await GET<System.Statistics>(`/system/statistics`,data);
 }
+

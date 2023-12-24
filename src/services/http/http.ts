@@ -74,8 +74,9 @@ service.interceptors.response.use(
   },
 );
 
-const tokenStr = 'LNTON_TOKEN_V1';
-const userID = 'LNTON_USER_ID';
+export const tokenStr = 'LNTON_TOKEN_V1';
+export const userID = 'LNTON_USER_ID';
+export const username = 'LNTON_USER_NAME';
 
 export function getToken() {
   return sessionStorage.getItem(tokenStr) as string;
@@ -91,10 +92,12 @@ export function getUID() {
 export function cleanStoreage() {
   sessionStorage.removeItem(tokenStr);
   sessionStorage.removeItem(userID);
+  sessionStorage.removeItem(username);
 }
-export function setToken(token: string, id: number) {
+export function setToken(token: string, id: number, name: string) {
   sessionStorage.setItem(tokenStr, token);
   sessionStorage.setItem(userID, id.toString());
+  sessionStorage.setItem(username, name);
 }
 
 service.interceptors.request.use((config) => {
@@ -108,18 +111,18 @@ async function request<T>(
   url: string,
   method: string,
   data?: object,
-  // cancelToken?: CancelToken,
   signal?: GenericAbortSignal,
   headers?: { [key: string]: string },
+  responseType?: any
 ) {
   return await service.request<T>({
     url,
     method,
     data: method == 'GET' ? {} : data,
     params: method == 'GET' ? data : {},
-    // cancelToken: cancelToken,
     signal: signal,
     headers: headers,
+    responseType:responseType
   });
 }
 // 查询
@@ -133,8 +136,10 @@ export async function POST<T>(
   params?: any,
   // cancelToken?: CancelToken,
   signal?: GenericAbortSignal,
+  headers?: { [key: string]: string },
+  responseType?: any
 ) {
-  return request<T>(url, 'POST', params, signal);
+  return request<T>(url, 'POST', params, signal, headers,responseType);
 }
 
 // 更新

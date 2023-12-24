@@ -37,5 +37,13 @@ declare namespace Device {
     PositionType: string | any;
     RegisteredAt: string;
     UserId: string;
+    CurrentCount:number;
+    MaxCount:number;
   };
+
+  type FindImportHistoryReq = {
+    page?: number;
+    size?: number;
+    type?: string;
+  }
 }

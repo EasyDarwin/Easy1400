@@ -1,6 +1,6 @@
+import { onCopyValue } from '@/package/copy/copy';
 import { CopyOutlined } from '@ant-design/icons';
-import { Button, message } from 'antd';
-import copy from 'copy-to-clipboard';
+import { Button } from 'antd';
 import React from 'react';
 
 const CopyBtn: React.FC<{
@@ -8,13 +8,6 @@ const CopyBtn: React.FC<{
   title?: string;
   disabled?: boolean;
 }> = ({ value, title = '复制', disabled = false }) => {
-  const onCopyValue = () => {
-    if (!value) return;
-    let res = copy(value);
-    if (res) return message.success(`${value} 复制成功`);
-    return message.error('复制失败');
-  };
-
   return (
     <Button
       style={{
@@ -24,7 +17,7 @@ const CopyBtn: React.FC<{
       }}
       disabled={disabled || !value}
       icon={<CopyOutlined className="w-3" />}
-      onClick={onCopyValue}
+      onClick={() => onCopyValue(value)}
     >
       <span className="text-[14px]">{title}</span>
     </Button>

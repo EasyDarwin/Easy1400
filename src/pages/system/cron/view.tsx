@@ -1,18 +1,33 @@
-import Box from '@/components/box/Box';
-import { FindCrontab, findCrontab } from '@/services/http/cron';
-import { ErrorHandle } from '@/services/http/http';
+import { useState } from 'react';
+
 import {
-  LayoutOutlined,
+  CheckCircleOutlined,
   PlayCircleOutlined,
   ReloadOutlined,
   StopOutlined,
 } from '@ant-design/icons';
-import { useQuery } from '@umijs/max';
-import { Button, Popconfirm, Space, Table, Tooltip } from 'antd';
+import { useMutation, useQuery } from '@umijs/max';
+import { Button, Popconfirm, Space, Table, Tooltip, message } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 
+import Box from '@/components/box/Box';
+import {
+  EditExecCrontab,
+  EditReloadCrontab,
+  EditStartCrontab,
+  EditStopCrontab,
+  FindCrontab,
+  findCrontab,
+} from '@/services/http/cron';
+import { ErrorHandle } from '@/services/http/http';
+import { AxiosResponse } from 'axios';
+
 export default function Page() {
-  const { data, isLoading, refetch } = useQuery(
+  const {
+    data: cronList,
+    isLoading: cronLoading,
+    refetch,
+  } = useQuery<Cron.FindResponse>(
     [findCrontab],
     () => FindCrontab().then((res) => res.data),
     {
@@ -31,7 +46,10 @@ export default function Page() {
     {
       title: '任务名称',
       dataIndex: 'title',
-      width: 120,
+      ellipsis: {
+        showTitle: false,
+      },
+      width:240
     },
     {
       title: '任务描述',
@@ -39,8 +57,17 @@ export default function Page() {
       ellipsis: {
         showTitle: false,
       },
-      render(value, record, index) {
-        return <Tooltip title={value}>{value}</Tooltip>;
+      render(text) {
+        return <Tooltip title={text}>{text}</Tooltip>;
+      },
+    },
+    {
+      title: '下次执行时间',
+      dataIndex: 'next_time_at',
+      align: 'center',
+      width: 180,
+      render(value) {
+        return `${value == '' ? '-' : value}`;
       },
     },
     {
@@ -48,14 +75,15 @@ export default function Page() {
       dataIndex: 'last_time_at',
       align: 'center',
       width: 180,
-      render(value, record, index) {
-        return `${value == '' ? '-' : value}`;
+      render(text:string) {
+        return `${text == '' ? '-' : text}`;
       },
     },
     {
       title: '执行次数',
       dataIndex: 'count',
-      width: 100,
+      align: 'center',
+      width: 140,
       ellipsis: {
         showTitle: false,
       },
@@ -63,17 +91,18 @@ export default function Page() {
     {
       title: '执行结果',
       dataIndex: 'result',
+      align: 'center',
       ellipsis: {
         showTitle: true,
       },
-      width: 100,
-      render(value, record, index) {
-        if (value == '') {
+      width: 140,
+      render(text) {
+        if (text == '') {
           return '-';
         }
         return (
-          <Tooltip title={value}>
-            <span style={{ color: value == 'OK' ? 'green' : 'red' }}>OK</span>
+          <Tooltip title={text}>
+            <span className={text == 'OK' ? 'text-green-500' : 'text-red-500'}>{text}</span>
           </Tooltip>
         );
       },
@@ -82,24 +111,54 @@ export default function Page() {
       title: '操作',
       align: 'center',
       fixed: 'right',
-      width: 100,
-      render(value, record, index) {
+      width: 140,
+      render(_, record:Cron.Item) {
         return (
           <Space>
-            {/* TODO: 此处可以要么暂停任务，要么开始任务 */}
             {record.id > 0 ? (
               <Tooltip title="暂停任务">
-                <Button danger icon={<StopOutlined />}></Button>
+                <Popconfirm
+                  title={
+                    <p>
+                      确定 暂停
+                      <span className="text-red-500"> {record.key} </span>
+                      任务吗?
+                    </p>
+                  }
+                  okButtonProps={{
+                    loading: stopLoadings.includes(record.key),
+                  }}
+                  onConfirm={() => {
+                    stopMutate(record.key);
+                  }}
+                >
+                  <Button
+                    loading={stopLoadings.includes(record.key)}
+                    danger
+                    icon={<StopOutlined />}
+                  ></Button>
+                </Popconfirm>
               </Tooltip>
             ) : (
               <Tooltip title="开始任务">
-                {/* TODO: 换个图标 */}
-                <Button icon={<LayoutOutlined />}></Button>
+                <Button
+                  onClick={() => {
+                    startMutate(record.key);
+                  }}
+                  loading={startLoadings.includes(record.key)}
+                  icon={<CheckCircleOutlined />}
+                ></Button>
               </Tooltip>
             )}
 
             <Tooltip title="立即执行">
-              <Button icon={<PlayCircleOutlined />}></Button>
+              <Button
+                loading={execLoadings.includes(record.key)}
+                onClick={() => {
+                  execMutate(record.key);
+                }}
+                icon={<PlayCircleOutlined />}
+              ></Button>
             </Tooltip>
           </Space>
         );
@@ -107,17 +166,87 @@ export default function Page() {
     },
   ];
 
+  //立即执行
+  const [execLoadings, setExecLoadings] = useState<string[]>([]);
+  const { mutate: execMutate } = useMutation(EditExecCrontab, {
+    onMutate: (v: string) => {
+      setExecLoadings([...execLoadings, v]);
+    },
+    onSuccess(data: AxiosResponse<{ key: string }>) {
+      message.success('执行成功');
+      setExecLoadings((v) => v.filter((item) => item !== data.data.key));
+      refetch();
+    },
+    onError: (error: Error) => {
+      setExecLoadings([]);
+      ErrorHandle(error);
+    },
+  });
+
+  //暂停执行
+  const [stopLoadings, setStopLoading] = useState<string[]>([]);
+  const { mutate: stopMutate } = useMutation(EditStopCrontab, {
+    onMutate: (v: string) => {
+      setStopLoading([...stopLoadings, v]);
+    },
+    onSuccess(data: AxiosResponse<{ key: string }>) {
+      message.success('执行成功');
+      setStopLoading((v) => v.filter((item) => item !== data.data.key));
+      refetch();
+    },
+    onError: (error: Error) => {
+      setStopLoading([]);
+      ErrorHandle(error);
+    },
+  });
+
+  //启动执行
+  const [startLoadings, setStartLoading] = useState<string[]>([]);
+  const { mutate: startMutate } = useMutation(EditStartCrontab, {
+    onMutate: (v: string) => {
+      setStartLoading([...startLoadings, v]);
+    },
+    onSuccess(data: AxiosResponse<{ key: string }>) {
+      message.success('执行成功');
+      setStartLoading((v) => v.filter((item) => item !== data.data.key));
+      refetch();
+    },
+    onError: (error: Error) => {
+      setStartLoading([]);
+      ErrorHandle(error);
+    },
+  });
+
+  //重载定时任务
+  const { mutate: reloadMutate,isLoading:reloadLoading } = useMutation(EditReloadCrontab, {
+    onSuccess() {
+      message.success('重载成功');
+      refetch();
+    },
+    onError: ErrorHandle,
+  });
+
   return (
     <div>
       <Box>
-        <Popconfirm title="确定要重载所有任务吗？">
-          <Button type="primary" icon={<ReloadOutlined />}>
+        <Popconfirm
+          onConfirm={() => {
+            reloadMutate();
+          }}
+          title="确定要重载所有任务吗？"
+        >
+          <Button loading={reloadLoading} type="primary" icon={<ReloadOutlined />}>
             重载所有任务
           </Button>
         </Popconfirm>
       </Box>
       <Box>
-        <Table columns={columns} dataSource={data?.items} pagination={false} />
+        <Table
+          loading={cronLoading}
+          columns={columns}
+          dataSource={cronList?.items}
+          pagination={false}
+        />
       </Box>
     </div>
   );

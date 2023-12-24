@@ -11,3 +11,17 @@ export function shortenString(str: string, maxLength = 10,startLength = 6,endLen
   }
   return str;
 }
+
+
+/**
+ * 生成随机字符
+ * @param {number} len 返回字符长度
+ */
+export function generateUniqueString(len:number) {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = len; i > 0; --i) {
+    result += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return result;
+}

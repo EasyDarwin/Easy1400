@@ -10,6 +10,7 @@ declare namespace Cron {
     id: number; // >0 即启用状态
     key: string;
     last_time_at: string;
+    next_time_at: string;
     result: string;
     title: string;
   };

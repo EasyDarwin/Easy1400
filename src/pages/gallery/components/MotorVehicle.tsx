@@ -1,24 +1,126 @@
+import useUpdateEffect from '@/hooks/useUpdateEffect';
+import { getImgURL } from '@/package/path/path';
+import { timeToFormatTime } from '@/package/time/time';
 import {
   DelMotorVehicles,
   FindMotorVehicles,
   findMotorVehicles,
 } from '@/services/http/gallery';
 import { ErrorHandle } from '@/services/http/http';
+import { DeleteOutlined } from '@ant-design/icons';
 import { useMutation, useQuery, useQueryClient } from '@umijs/max';
-import { Divider, Empty, Pagination, Spin, message } from 'antd';
+import {
+  Affix,
+  Button,
+  Checkbox,
+  Divider,
+  Empty,
+  Image,
+  Pagination,
+  Popconfirm,
+  Space,
+  Spin,
+  Table,
+  Tooltip,
+  message,
+} from 'antd';
+import { ColumnsType } from 'antd/es/table';
 import { AxiosResponse } from 'axios';
 import { useContext, useState } from 'react';
 import CardBox from './CardBox';
 import SelectControl from './SelectControl';
 import SharedDataContext from './SharedDataContext';
 
+interface PagerWithPlateNo extends Gallery.Pager {
+  PlateNo?: string;
+}
+
 const MotorVehicle: React.FC = () => {
   const sharedData = useContext(SharedDataContext);
 
-  const [pagination, setPagination] = useState<Gallery.Pager>({
+  const [loadings, setLoadings] = useState<string[]>([]);
+
+  const columns: ColumnsType<Gallery.MotorVehicleObject> = [
+    {
+      title: '',
+      dataIndex: 'MotorVehicleID',
+      render: (text: string) => {
+        return (
+          openCheckbox && (
+            <Checkbox
+              onClick={() => onCheck(text)}
+              checked={checkList.includes(text)}
+            ></Checkbox>
+          )
+        );
+      },
+    },
+    {
+      title: 'ID',
+      dataIndex: 'MotorVehicleID',
+    },
+    {
+      title: '车牌',
+      dataIndex: 'FaceAppearTime',
+      render: (_, record: Gallery.MotorVehicleObject) => (
+        <span>{record.PlateNo ?? '-'}</span>
+      ),
+    },
+    {
+      title: '抓拍时间',
+      dataIndex: 'MarkTime',
+      render: (text: string) => <span>{timeToFormatTime(text)}</span>,
+    },
+    {
+      title: '图片',
+      render: (_, record: Gallery.MotorVehicleObject) => (
+        <Space size="middle">
+          {record.SubImageList?.SubImageInfoObject.map(
+            (item: Gallery.SubImageInfoObject, index: number) => (
+              <Image
+                key={item.ImageID}
+                src={`${getImgURL(item.Data)}?h=40`}
+                preview={{
+                  src: getImgURL(item.Data),
+                }}
+              />
+            ),
+          )}
+        </Space>
+      ),
+    },
+    {
+      title: '操作',
+      fixed: 'right',
+      render: (_, record: Gallery.MotorVehicleObject) => (
+        <Space size="middle">
+          <Tooltip title="删除图片">
+            <Popconfirm
+              title={<p>确定删除图片吗?</p>}
+              onConfirm={() => {
+                delMutate(record.MotorVehicleID);
+              }}
+            >
+              <Button
+                type="dashed"
+                loading={loadings.includes(record.MotorVehicleID)}
+                danger
+                icon={<DeleteOutlined />}
+              />
+            </Popconfirm>
+          </Tooltip>
+        </Space>
+      ),
+    },
+  ];
+
+  const [pagination, setPagination] = useState<PagerWithPlateNo>({
     PageRecordNum: 100,
     RecordStartNo: 1,
     DeviceID: sharedData.deviceID || '',
+    PlateNo: '',
+    start_at: sharedData.searchTimeValue?.start,
+    end_at: sharedData.searchTimeValue?.end,
   });
 
   const { data: galleryList, isLoading: galleryLoading } =
@@ -32,6 +134,21 @@ const MotorVehicle: React.FC = () => {
         onError: ErrorHandle,
       },
     );
+
+  //监听搜索值变化
+  useUpdateEffect(() => {
+    setPagination({
+      ...pagination,
+      PlateNo: sharedData.searchPlateNoValue,
+      DeviceID: sharedData.searchIdValue ?? sharedData.deviceID,
+      start_at: sharedData.searchTimeValue?.start,
+      end_at: sharedData.searchTimeValue?.end,
+    });
+  }, [
+    sharedData.searchPlateNoValue,
+    sharedData.searchIdValue,
+    sharedData.searchTimeValue,
+  ]);
 
   const queryClient = useQueryClient();
 
@@ -85,6 +202,9 @@ const MotorVehicle: React.FC = () => {
 
   //单个删除
   const { mutate: delMutate } = useMutation(DelMotorVehicles, {
+    onMutate: (v: string) => {
+      setLoadings([...loadings, v]);
+    },
     onSuccess: (res) => {
       message.success('删除成功');
       setCheckList([]);
@@ -95,46 +215,65 @@ const MotorVehicle: React.FC = () => {
 
   return (
     <div>
-      <SelectControl
-        isLoading={delLoading}
-        openCheckbox={openCheckbox}
-        confirm={() => {
-          delMutates(checkList.join());
-        }}
-        cancel={() => {}}
-        onCheckAll={onCheckAll}
-        onCheckReverse={onCheckReverse}
-        onOpenCheckbox={onOpenCheckbox}
-      />
+      <Affix offsetTop={0}>
+        <SelectControl
+          isLoading={delLoading}
+          openCheckbox={openCheckbox}
+          confirm={() => {
+            delMutates(checkList.join());
+          }}
+          cancel={() => {}}
+          onCheckAll={onCheckAll}
+          onCheckReverse={onCheckReverse}
+          onOpenCheckbox={onOpenCheckbox}
+        />
+      </Affix>
       <Spin spinning={galleryLoading}>
-        <div className="px-6">
-          <div className="grid-fill">
-            {galleryList?.MotorVehicleListObject.MotorVehicleObject.length ? (
-              galleryList?.MotorVehicleListObject.MotorVehicleObject.map(
-                (item: Gallery.MotorVehicleObject, idx: any) => (
-                  <CardBox
-                    key={item.MotorVehicleID}
-                    data={item}
-                    showCheck={openCheckbox}
-                    checkList={checkList}
-                    infoLableKey={['MotorVehicleID', 'MarkTime']}
-                    onCheck={onCheck}
-                    onClickDel={delMutate}
-                  />
-                ),
-              )
-            ) : (
-              <Empty
-                style={{ width: '100%', height: '100%' }}
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-              />
-            )}
+        {sharedData.viewType === 'card' ? (
+          galleryList?.MotorVehicleListObject.MotorVehicleObject.length ? (
+            <>
+              <div className="grid-fill">
+                {galleryList?.MotorVehicleListObject.MotorVehicleObject.map(
+                  (item: Gallery.MotorVehicleObject) => (
+                    <CardBox
+                      key={item.MotorVehicleID}
+                      data={item}
+                      showCheck={openCheckbox}
+                      checkList={checkList}
+                      infoLableKey={['MotorVehicleID', 'MarkTime', 'PlateNo']}
+                      offset={[-46, 16]}
+                      onCheck={onCheck}
+                      onClickDel={delMutate}
+                    />
+                  ),
+                )}
+              </div>
+              <Divider />
+            </>
+          ) : (
+            <Empty
+              style={{ width: '100%' }}
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+            />
+          )
+        ) : (
+          <div className="h-full ">
+            <Table
+              key={'motorTabel'}
+              pagination={{
+                position: ['none'],
+                total: galleryList?.MotorVehicleListObject.TotalNum,
+                pageSize: pagination.PageRecordNum,
+              }}
+              columns={columns}
+              dataSource={
+                galleryList?.MotorVehicleListObject.MotorVehicleObject
+              }
+            />
           </div>
-        </div>
+        )}
 
-        <Divider className="mb-3" />
-
-        <div className="flex justify-end">
+        <div className="flex justify-end mt-3">
           <Pagination
             showSizeChanger
             defaultCurrent={1}

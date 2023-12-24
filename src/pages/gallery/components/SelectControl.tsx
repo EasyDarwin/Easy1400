@@ -21,7 +21,7 @@ const SelectControl: React.FC<ISelectControl> = ({
   isLoading
 }) => {
   return (
-    <div className="flex justify-between items-center mb-3">
+    <div className="flex justify-between items-center py-2 bg-white">
       <div>
         {openCheckbox && (
           <Button.Group>

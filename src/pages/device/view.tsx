@@ -1,34 +1,34 @@
 import {
-  DeleteOutlined,
-  EditOutlined,
-  FilterOutlined,
-  PlusOutlined,
-  UnorderedListOutlined,
-} from '@ant-design/icons';
-import { PageContainer } from '@ant-design/pro-layout';
-import { history, useMutation, useQuery } from '@umijs/max';
-import { Button, Popconfirm, Space, Table, Tag, Tooltip, message } from 'antd';
-import React, { useRef, useState } from 'react';
-
-import { shortenString } from '@/package/string/string';
-import {
   DelDevice,
+  ExportDevice,
   FindDeviceLists,
   getDeviceList,
 } from '@/services/http/device';
 import { ErrorHandle } from '@/services/http/http';
+import {
+  DeleteOutlined,
+  DownloadOutlined,
+  EditOutlined,
+  FilterOutlined,
+  PlusOutlined,
+  UnorderedListOutlined,
+  UploadOutlined,
+} from '@ant-design/icons';
+import { PageContainer } from '@ant-design/pro-layout';
+import { history, useMutation, useQuery } from '@umijs/max';
+import { Button, Popconfirm, Space, Table, Tag, Tooltip, message } from 'antd';
+import Search from 'antd/es/input/Search';
 import { ColumnsType } from 'antd/es/table';
 import { AxiosResponse } from 'axios';
+import React, { useRef, useState } from 'react';
 
-import FunctionBar, {
-  ButtonList,
-  SearchComponent,
-} from '@/components/bar/FunctionBar';
+import FunctionBar, { ButtonList } from '@/components/bar/FunctionBar';
 import Box from '@/components/box/Box';
 import CopyBtn from '@/components/copy/CopyBtn';
 import { POLLING_TIME } from '@/constants/index';
 import DeviceFrom from './components/DeviceFrom';
 import QuantityFrom, { IQuantityFromProps } from './components/QuantityFrom';
+import ImportFrom,{IImportFromProps} from './components/ImportFrom';
 
 interface IDeviceFrom {
   setFieldsValue: (data?: Device.APEObject, isEdit?: boolean) => void;
@@ -36,18 +36,18 @@ interface IDeviceFrom {
 
 const View: React.FC = () => {
   const deviceFromRef = useRef<IDeviceFrom>();
-  const quantityFrom = useRef<IQuantityFromProps>();
+  const quantityFromRef = useRef<IQuantityFromProps>();
+  const importFromRef = useRef<IImportFromProps>();
+  
   const columns: ColumnsType<Device.APEObject> = [
     {
       title: 'ID',
       dataIndex: 'ApeID',
       align: 'center',
-      ellipsis: {
-        showTitle: false,
-      },
-      width: 130,
+      width: 200,
       render: (text: string) => (
-        <Tooltip title={text}>{shortenString(text)}</Tooltip>
+        // <Tooltip title={text}>{shortenString(text)}</Tooltip>
+        <span>{text}</span>
       ),
     },
     {
@@ -75,7 +75,7 @@ const View: React.FC = () => {
         <CopyBtn value={text} title="口令" disabled={record.IsOnline === '1'} />
       ),
     },
-    
+
     {
       title: '状态',
       dataIndex: 'IsOnline',
@@ -105,30 +105,42 @@ const View: React.FC = () => {
               title={'注册时间'}
               placement="left"
             >
-              {record.RegisteredAt ? record.RegisteredAt : '-'}
+              {record.RegisteredAt}
             </Tooltip>
           </div>
         </>
       ),
     },
     {
-      title: '当前数量',
+      title: '今天数量',
       dataIndex: 'CurrentCount',
       align: 'center',
       width: 110,
+      render: (text: string, record: Device.APEObject) => (
+        <span
+          className={
+            record.CurrentCount >= record.MaxCount && record.MaxCount > 0
+              ? 'text-red-500'
+              : ''
+          }
+        >
+          {text || '-'}
+        </span>
+      ),
     },
     {
-      title: '限制总数',
+      title: '每天限制总数',
       dataIndex: 'MaxCount',
       align: 'center',
       width: 110,
+      render: (text: string) => <span>{text || '-'}</span>,
     },
     {
       title: 'IP',
       dataIndex: 'IPAddr',
       align: 'center',
       width: 150,
-      render: (text: string, record: Device.APEObject) => <span>{text}</span>,
+      render: (text: string) => <span>{text ? text : '-'}</span>,
     },
     {
       title: '操作',
@@ -161,7 +173,10 @@ const View: React.FC = () => {
               <Button
                 icon={<FilterOutlined />}
                 onClick={() => {
-                  quantityFrom.current?.setFieldsValue(record.ApeID)
+                  quantityFromRef.current?.setFieldsValue({
+                    id: record.ApeID,
+                    max_count: record.MaxCount,
+                  });
                 }}
               />
             </Tooltip>
@@ -235,6 +250,21 @@ const View: React.FC = () => {
     deviceFromRef.current?.setFieldsValue();
   };
 
+  const { mutate: exprotExcelMutate, isLoading: exprotExcelLoading } =
+    useMutation(ExportDevice, {
+      onSuccess: (res: AxiosResponse) => {
+        const fileName = res.headers['content-disposition'].split('=')[1];
+        const blob = new Blob([res.data], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        // TODO 这里a链接浅封装一下 支持下载完成后删除
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.click();
+      },
+      onError: ErrorHandle,
+    });
+
   const funcBtnList: ButtonList[] = [
     {
       label: '添加',
@@ -243,20 +273,41 @@ const View: React.FC = () => {
       icon: <PlusOutlined />,
       onClick: onAddBtnClick,
     },
+    {
+      label: '导出',
+      loading: exprotExcelLoading,
+      type: 'primary',
+      icon: <UploadOutlined />,
+      onClick: exprotExcelMutate,
+    },
+    {
+      label: '导入',
+      loading: false,
+      type: 'primary',
+      icon: <DownloadOutlined />,
+      onClick: () => {
+        importFromRef.current?.openModalvisible()
+      },
+    },
   ];
 
-  const funcSearchComponet: SearchComponent = {
-    placeholder: '请输入设备 名称 或 ID',
-    onSearch: (value: string) => {
-      setPagination({ ...pagination, value: value });
-    },
-  };
+  const funcSearchComponet = (
+    <Search
+      className="w-96"
+      enterButton
+      placeholder="请输入id 或 名称"
+      onSearch={(value: string) => {
+        setPagination({ ...pagination, value: value });
+      }}
+    />
+  );
   return (
     <PageContainer title={process.env.PAGE_TITLE}>
       <Box>
         <FunctionBar
-          searchChannle={funcSearchComponet}
+          rigthChannle={funcSearchComponet}
           btnChannle={funcBtnList}
+          rigthChannleClass="flex justify-end"
         />
       </Box>
       <Box>
@@ -285,7 +336,8 @@ const View: React.FC = () => {
         />
       </Box>
       <DeviceFrom ref={deviceFromRef} />
-      <QuantityFrom ref={quantityFrom} />
+      <QuantityFrom ref={quantityFromRef} />
+      <ImportFrom ref={importFromRef}/>
     </PageContainer>
   );
 };

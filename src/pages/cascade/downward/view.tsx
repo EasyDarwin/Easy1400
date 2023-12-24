@@ -3,9 +3,9 @@ import React, { useRef, useState } from 'react';
 
 import {
   ApartmentOutlined,
-  ApiOutlined,
   BellOutlined,
   DeleteOutlined,
+  FormOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
@@ -16,33 +16,27 @@ import FunctionBar, { ButtonList } from '@/components/bar/FunctionBar';
 import Box from '@/components/box/Box';
 import { shortenString } from '@/package/string/string';
 import {
-  DelCascade,
-  FindCascadeLists,
-  getCascades,
+  DelDownwardCascade,
+  FindDownwardCascade,
+  findDownwardCascade,
 } from '@/services/http/cascade';
 import { ErrorHandle } from '@/services/http/http';
-import CascadeFrom, { ICascadeRef } from './components/CascadeFrom';
-import DeviceFrom, { IDeviceRef } from './components/DeviceFrom';
+import { AxiosResponse } from 'axios';
+import DownCascadeFrom, { IDownCascadeRef } from './components/DownCascadeFrom';
 
 const View: React.FC = () => {
-  const columns: ColumnsType<Cascade.Item> = [
+  const columns: ColumnsType<Cascade.DownItem> = [
     {
       title: 'ID',
       dataIndex: 'id',
       align: 'center',
-      ellipsis: {
-        showTitle: false,
-      },
-      width: 130,
-      render: (text: string) => (
-        <Tooltip title={text}>{shortenString(text)}</Tooltip>
-      ),
+      width:220
     },
     {
       title: '名称',
       dataIndex: 'name',
       align: 'center',
-      width: 150,
+      width:200,
       render: (text: string) => <span>{text ? text : '-'}</span>,
     },
     {
@@ -50,33 +44,38 @@ const View: React.FC = () => {
       dataIndex: 'is_online',
       align: 'center',
       width: 110,
-      render: (text: string, record) => (
-        <Tag color={text == '1' ? 'green' : 'red'}>
-          {text == '1' ? '在线' : '离线'}
-        </Tag>
+      render: (text: string) => (
+        <Tag color={text ? 'green' : 'red'}>{text ? '在线' : '离线'}</Tag>
       ),
     },
     {
-      title: '状态描述',
-      dataIndex: 'status',
-      align: 'center',
-      render: (text: string) => <Tooltip title={text}>{text}</Tooltip>,
-    },
-
-    {
-      title: '地址',
-      dataIndex: 'ip',
-      align: 'center',
-      render: (text: string, record: Cascade.Item) => {
-        const str = `${record.ip}:${record.port}`;
-        return <span>{str ? str : '-'}</span>;
-      },
-    },
-    {
-      title: '心跳时间/注册时间',
-      dataIndex: 'created_at',
+      title: 'IP地址',
+      dataIndex: 'remote_ip',
       align: 'center',
       width: 200,
+      render: (text: string) => (
+        <span>{text != '' ? text : '-'}</span>
+      ),
+    },
+    {
+      title: '端口',
+      dataIndex: 'remote_port',
+      align: 'center',
+      width: 100,
+      render: (text: string) => <span>{text ? text : '-'}</span>,
+    },
+    {
+      title: '心跳时间',
+      dataIndex: 'heartbeat_at',
+      align: 'center',
+      width:200,
+      render: (text: string) => <span>{text ? text : '-'}</span>,
+    },
+    {
+      title: '注册时间',
+      dataIndex: 'register_at',
+      align: 'center',
+      width:200,
       render: (text: string) => <span>{text ? text : '-'}</span>,
     },
     {
@@ -84,51 +83,58 @@ const View: React.FC = () => {
       align: 'center',
       fixed: 'right',
       width: 180,
-      render: (text: string, record: Cascade.Item) => {
+      render: (_: string, record: Cascade.DownItem) => {
         return (
           <Space>
-            {/* <Tooltip title="上级的布控">
-              <Button onClick={()=>{
-                history.push(`/cascade/dispositions`)
-              }} icon={<ClusterOutlined />} />
-            </Tooltip> */}
-            <Tooltip title="上级的订阅">
+            <Tooltip title="编辑">
               <Button
                 onClick={() => {
-                  history.push(`/cascade/subscribes?device_id=${record.id}`);
+                  let data: Cascade.DownReq = {
+                    platform_id:record.id,
+                    name:record.name ?? '',
+                    user_name:record.user_name,
+                    password:record.password,
+                    realm:record.realm,
+                    remote_port:record.remote_port,
+                    description:record.description,
+                  }
+                  downCascadeRef.current?.setFieldsValue(data,true);
+                }}
+                icon={<FormOutlined />}
+              />
+            </Tooltip>
+            <Tooltip title="订阅内容">
+              <Button
+                onClick={() => {
+                  history.push(
+                    `/downward/cascade/subscribes?device_id=${record.id}&is_online=${record.is_online}`,
+                  );
                 }}
                 icon={<ApartmentOutlined />}
               />
             </Tooltip>
-            <Tooltip title="通知记录">
+            {/* <Tooltip title="下级的布控">
               <Button
                 onClick={() => {
-                  history.push(`/cascade/notification?device_id=${record.id}`);
+                  history.push(
+                    `/downward/cascade/dispositions?device_id=${record.id}`,
+                  );
                 }}
-                icon={<BellOutlined />}
+                icon={<AppstoreOutlined />}
               />
-            </Tooltip>
-            <Tooltip title="选择共享设备">
-              <Button
-                onClick={() => {
-                  deviceRef.current?.setFieldsValue({id:record.id,device_ids:record.device_ids || []});
-                }}
-                icon={<ApiOutlined />}
-              />
-            </Tooltip>
+            </Tooltip> */}
             <Tooltip title="删除">
               <Popconfirm
                 title={
                   <p>
                     确定删除
                     <span className="text-red-500"> {record.id} </span>
-                    级联吗?
+                    吗?
                   </p>
                 }
-                okButtonProps={{
-                  loading: loadings.includes(record.id),
+                onConfirm={() => {
+                  deleteCascadeMutate(record.id);
                 }}
-                onConfirm={() => deleteCascadeMutate(record.id)}
               >
                 <Button
                   loading={loadings.includes(record.id)}
@@ -143,6 +149,7 @@ const View: React.FC = () => {
       },
     },
   ];
+  const downCascadeRef = useRef<IDownCascadeRef>();
 
   const funcBtnList: ButtonList[] = [
     //顶部按钮列表
@@ -152,33 +159,31 @@ const View: React.FC = () => {
       type: 'primary',
       icon: <PlusOutlined />,
       onClick: () => {
-        cascadeRef.current?.setFieldsValue();
+        downCascadeRef.current?.setFieldsValue();
       },
     },
   ];
-  const cascadeRef = useRef<ICascadeRef>();
-  const deviceRef = useRef<IDeviceRef>();
 
+  //删除下级视图库
   const [loadings, setLoadings] = useState<string[]>([]);
-  const { mutate: deleteCascadeMutate, isLoading: deleteCascadeLoading } =
-    useMutation(DelCascade, {
-      onMutate: (v: string) => {
-        setLoadings([...loadings, v]);
-      },
-      onSuccess(data: any) {
-        message.success('删除成功');
-        setLoadings((v) => v.filter((item) => item !== data.data.id));
-        refetch();
-      },
-      onError: (error: Error) => {
-        setLoadings([]);
-        ErrorHandle(error);
-      },
-    });
+  const { mutate: deleteCascadeMutate } = useMutation(DelDownwardCascade, {
+    onMutate: (v: string) => {
+      setLoadings([...loadings, v]);
+    },
+    onSuccess(res: AxiosResponse) {
+      message.success('删除成功');
+      setLoadings((v) => v.filter((item) => item !== res.data.id));
+      refetch();
+    },
+    onError: (error: Error) => {
+      setLoadings([]);
+      ErrorHandle(error);
+    },
+  });
 
   const [pagination, setPagination] = useState<Cascade.ListReq>({
     page: 1,
-    limit: 10,
+    size: 10,
   });
 
   const {
@@ -186,9 +191,11 @@ const View: React.FC = () => {
     isLoading: cascadeLoading,
     refetch,
   } = useQuery(
-    [getCascades],
+    [findDownwardCascade, pagination],
     () =>
-      FindCascadeLists(pagination).then((res) => res.data as Cascade.ListRes),
+      FindDownwardCascade(pagination).then(
+        (res: AxiosResponse<Cascade.DownListRes>) => res.data,
+      ),
     {
       refetchInterval: 10000,
       onError: (error: Error) => ErrorHandle(error),
@@ -206,21 +213,20 @@ const View: React.FC = () => {
           rowKey={'ApeID'}
           key={'system_app_table_key'}
           columns={columns}
-          scroll={{x:1300}}
+          scroll={{ x: 1300 }}
           dataSource={cascadeData?.items}
           pagination={{
             total: cascadeData?.total,
-            pageSize: pagination.limit,
+            pageSize: pagination.size,
             current: pagination.page,
-            onChange: (page: number, limit: number) => {
-              setPagination({ ...pagination, page, limit });
+            onChange: (page: number, size: number) => {
+              setPagination({ ...pagination, page, size });
             },
             showTotal: (total) => `共 ${total} 条`,
           }}
         />
       </Box>
-      <CascadeFrom ref={cascadeRef} />
-      <DeviceFrom ref={deviceRef} />
+      <DownCascadeFrom ref={downCascadeRef} />
     </PageContainer>
   );
 };

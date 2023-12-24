@@ -1,7 +1,9 @@
 import { AddCascade, getCascades } from '@/services/http/cascade';
 import { ErrorHandle } from '@/services/http/http';
-import { useMutation, useQueryClient } from '@umijs/max';
+import { FindSystemInfo, findSystemInfo } from '@/services/http/system';
+import { useMutation, useQuery, useQueryClient } from '@umijs/max';
 import { Form, Input, InputNumber, Modal, message } from 'antd';
+import { AxiosResponse } from 'axios';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 
 export interface ICascadeRef {
@@ -26,8 +28,10 @@ const CascadeFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
     useMutation(AddCascade, {
       onSuccess() {
         message.success('新增成功');
-        queryClient.invalidateQueries([getCascades]);
         handleClose();
+        setTimeout(() => {
+          queryClient.invalidateQueries([getCascades]);
+        }, 1500);
       },
       onError: ErrorHandle,
     });
@@ -37,6 +41,16 @@ const CascadeFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
     form.resetFields();
     setModalVisible(false);
   };
+
+  //获取系统信息
+  const { data: infoData, isLoading: infoLoading } =
+    useQuery<System.SystemInfo>(
+      [findSystemInfo],
+      () => FindSystemInfo().then((res: AxiosResponse) => res.data),
+      {
+        onError: ErrorHandle,
+      },
+    );
 
   return (
     <Modal
@@ -64,7 +78,12 @@ const CascadeFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
         <Form.Item label="名称" name="name" rules={[{ required: true }]}>
           <Input placeholder="上级视图库名称" />
         </Form.Item>
-        <Form.Item label="用户名" name="username" rules={[{ required: true }]}>
+        <Form.Item
+          label="用户名"
+          name="username"
+          initialValue={infoData?.username}
+          rules={[{ required: true }]}
+        >
           <Input placeholder="上级视图库用户名" />
         </Form.Item>
         <Form.Item label="密码" name="password" rules={[{ required: true }]}>

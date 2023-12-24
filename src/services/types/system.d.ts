@@ -62,7 +62,8 @@ declare namespace System {
      * 版本号
      */
     version: string;
-    [property: string]: any;
+    port:string;
+    host:string;
   };
 
   type Statistics = {

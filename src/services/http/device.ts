@@ -1,3 +1,4 @@
+import { AxiosProgressEvent } from 'axios';
 import { DELETE, GET, POST, PUT } from './http';
 
 //获取设备列表
@@ -23,14 +24,36 @@ export async function GetDeviceInfo(id: string) {
 }
 
 //修改设备
-export async function EditDevice(data: {
-  id: string;
-  data: Device.APEObject;
-}) {
+export async function EditDevice(data: { id: string; data: Device.APEObject }) {
   return await PUT(`/devices/${data.id}`, data.data);
 }
 
 //设置每天最大采集数量
-export async function EditMaxCollectNum(data: {id:string;max_count:number}){
-  return await PUT(`/devices/${data.id}/limit`, {max_count:data.max_count});
+export async function EditMaxCollectNum(data: {
+  id: string;
+  max_count: number;
+}) {
+  return await PUT(`/devices/${data.id}/limit`, { max_count: data.max_count });
+}
+
+//导出 excel 表格
+export async function ExportDevice() {
+  return await GET(`/devices/export`);
+}
+
+//导入 设备列表
+export async function ImportDevice(data: FormData) {
+  return await POST(`/devices/import`, data,undefined,{'Content-Type': 'multipart/form-data'},'blob');
+}
+
+
+//获取导入历史
+export const findImportHistory = 'FindImportHistory';
+export async function FindImportHistory(data:Device.FindImportHistoryReq) {
+  return await GET(`/devices/history`, data);
+}
+
+//获取导入详情
+export async function FindImportDetail(id:string) {
+  return await GET(`/devices/history/${id}`);
 }

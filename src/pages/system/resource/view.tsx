@@ -26,22 +26,22 @@ export default function Page() {
       label: '非机动车',
       name: 'none_motor_vehicle',
     },
-    {
-      label: '物品',
-      name: 'thing',
-    },
-    {
-      label: '图片',
-      name: 'picture',
-    },
-    {
-      label: '视频',
-      name: 'video',
-    },
-    {
-      label: '文件',
-      name: 'file',
-    },
+    // {
+    //   label: '物品',
+    //   name: 'thing',
+    // },
+    // {
+    //   label: '图片',
+    //   name: 'picture',
+    // },
+    // {
+    //   label: '视频',
+    //   name: 'video',
+    // },
+    // {
+    //   label: '文件',
+    //   name: 'file',
+    // },
   ];
 
   const { data: configData, isLoading: configLoading } =

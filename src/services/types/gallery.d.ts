@@ -4,6 +4,8 @@ declare namespace Gallery {
     PageRecordNum: number;
     RecordStartNo: number;
     DeviceID: string;
+    start_at?:number;
+    end_at?:number;
   };
 
   type FindRes = {
@@ -200,7 +202,7 @@ declare namespace Gallery {
     PassportType?: string;
     PersonAppearTime?: string;
     PersonDisAppearTime?: string;
-    PersonID?: string;
+    PersonID: string;
     PersonOrg?: string;
     PhysicalFeature?: string;
     ResidenceAdminDivision?: string;
@@ -316,7 +318,7 @@ declare namespace Gallery {
     LeftTopX?: number;
     LeftTopY?: number;
     MarkTime?: string;
-    NonMotorVehicleID?: string;
+    NonMotorVehicleID: string;
     PlateClass?: string;
     PlateDescribe?: string;
     PlateNo?: string;

@@ -12,12 +12,14 @@ import {
 } from 'antd';
 import React, { useContext, useRef, useState } from 'react';
 import SharedDataContext from './SharedDataContext';
+import CopyIcon from '@/components/copy/CopyIcon';
 
 interface ICardBoxProps {
   data: any;
-  infoLableKey: [string, string];
+  infoLableKey: [string, string, string?];
   showCheck: boolean;
   checkList?: string[];
+  offset?: [number | string, number | string];
   onClickImage?: () => void;
   onClickDel: (id: string) => void;
   onCheck: (id: string) => void;
@@ -28,6 +30,7 @@ const CardBox: React.FC<ICardBoxProps> = ({
   infoLableKey,
   showCheck,
   checkList,
+  offset = [-32, 16],
   onClickImage,
   onClickDel,
   onCheck,
@@ -50,19 +53,24 @@ const CardBox: React.FC<ICardBoxProps> = ({
     return `${window.location.origin}${process.env.BASEURL}${path}`;
   };
 
-  //TODO 这里会不会影响，性能，考虑使用map对照
-  const findObjectByKey = () => {
-    let obj = sharedData.galleryDictTypes.find(
-      (item: Dict.DataItem) => item.value === cover.typeId,
-    );
-    return obj?.label || '图片';
+  //map对照
+  const findObjectByKey = (): string => {
+    const label = sharedData.galleryDictTypes[cover.typeId] || '图片';
+    return label;
+  };
+
+  //开启多选 点击整个box都是选中
+  const onCheckbox = () => {
+    if (showCheck) {
+      onCheck(data[infoLableKey[0]]);
+    }
   };
 
   return (
-    <div className="my-2 relative">
+    <div onClick={onCheckbox} className="my-2 relative z-0">
       {showCheck && (
         <Checkbox
-          className="absolute left-2 top-1 z-20"
+          className="absolute left-2 top-1 z-10"
           onChange={() => onCheck(data[infoLableKey[0]])}
           checked={checkList?.includes(data[infoLableKey[0]])}
         ></Checkbox>
@@ -76,7 +84,12 @@ const CardBox: React.FC<ICardBoxProps> = ({
           okText="确定"
           cancelText="取消"
         >
-          <Button shape="circle" style={{border:'none'}} danger icon={<DeleteOutlined />} />
+          <Button
+            shape="circle"
+            style={{ border: 'none' }}
+            danger
+            icon={<DeleteOutlined />}
+          />
         </Popconfirm>
       </div>
 
@@ -84,16 +97,22 @@ const CardBox: React.FC<ICardBoxProps> = ({
         style={{ boxShadow: 'none' }}
         color="#999"
         count={findObjectByKey()}
-        offset={[-32, 16]}
+        offset={offset}
       >
         <Card
           className="w-52"
           hoverable
           // onClick={onClickImage}
           cover={
-            <>
+            <div className="relative">
               <img
-                onClick={() => setVisible(true)}
+                onClick={() => {
+                  if (showCheck) {
+                    onCheckbox();
+                  } else {
+                    setVisible(true);
+                  }
+                }}
                 className="w-full object-cover aspect-[4/3]"
                 loading="lazy"
                 onError={(e: any) => {
@@ -113,13 +132,19 @@ const CardBox: React.FC<ICardBoxProps> = ({
                 }}
                 items={imageList.current}
               />
-            </>
+
+              {infoLableKey[2] && (
+                <div className="absolute left-0 bottom-0 px-1 rounded-tr-md overflow-hidden bg-blue-100 bg-opacity-30 text-white  backdrop-blur-lg">
+                  {data[infoLableKey[2]] || '未知'}
+                </div>
+              )}
+            </div>
           }
           bodyStyle={{
             padding: '4px 0',
           }}
         >
-          <div>
+          <div className="flex items-center">
             {data.SubImageList?.SubImageInfoObject &&
               data.SubImageList?.SubImageInfoObject.map(
                 (item: Gallery.SubImageInfoObject, index: number) => {
@@ -142,6 +167,10 @@ const CardBox: React.FC<ICardBoxProps> = ({
                       }}
                       style={{
                         marginRight: '10px',
+                        maxWidth:
+                          data.SubImageList?.SubImageInfoObject.length >= 3
+                            ? '60px'
+                            : '90px',
                         border:
                           cover.url == item.Data ? 'none' : '2px solid white',
                         backgroundColor:
@@ -156,14 +185,17 @@ const CardBox: React.FC<ICardBoxProps> = ({
               )}
           </div>
 
-          <div className="mt-1 px-1 text-md w-full truncate">
-            {shortenString(data[infoLableKey[0]], 20, 4, 16)}
-          </div>
           <div>
             <Tooltip title="抓拍时间">
-              <span className="text-slate-400 px-1">
+              <span className="px-1 text-md w-full truncate ">
                 {timeToFormatTime(cover.time)}
               </span>
+            </Tooltip>
+          </div>
+
+          <div className="text-slate-400 px-1">
+            <Tooltip title={data[infoLableKey[0]]}>
+              {shortenString(data[infoLableKey[0]], 20, 4, 14)}
             </Tooltip>
           </div>
         </Card>

@@ -1,4 +1,18 @@
-import { Divider, Empty, Pagination, Spin, message } from 'antd';
+import {
+  Affix,
+  Button,
+  Checkbox,
+  Divider,
+  Empty,
+  Image,
+  Pagination,
+  Popconfirm,
+  Space,
+  Spin,
+  Table,
+  Tooltip,
+  message,
+} from 'antd';
 import { useContext, useState } from 'react';
 
 import { DelFace, DelFaces, FindFace, findFace } from '@/services/http/gallery';
@@ -6,6 +20,11 @@ import { ErrorHandle } from '@/services/http/http';
 import { useMutation, useQuery, useQueryClient } from '@umijs/max';
 import { AxiosResponse } from 'axios';
 
+import useUpdateEffect from '@/hooks/useUpdateEffect';
+import { getImgURL } from '@/package/path/path';
+import { timeToFormatTime } from '@/package/time/time';
+import { DeleteOutlined } from '@ant-design/icons';
+import { ColumnsType } from 'antd/es/table';
 import '../index.less';
 import CardBox from './CardBox';
 import SelectControl from './SelectControl';
@@ -15,10 +34,86 @@ const Face: React.FC = () => {
   const sharedData = useContext(SharedDataContext);
   const queryClient = useQueryClient();
 
+  const [loadings, setLoadings] = useState<string[]>([]);
+
+  const columns: ColumnsType<Gallery.FaceObject> = [
+    {
+      title: '',
+      dataIndex: 'FaceID',
+      render: (text: string) => {
+        return (
+          openCheckbox && (
+            <Checkbox
+              onClick={() => onCheck(text)}
+              checked={checkList.includes(text)}
+            ></Checkbox>
+          )
+        );
+      },
+    },
+    {
+      title: 'ID',
+      dataIndex: 'FaceID',
+    },
+    {
+      title: '人脸出现时间',
+      dataIndex: 'FaceAppearTime',
+      render: (text: string) => <span>{timeToFormatTime(text)}</span>,
+    },
+    {
+      title: '人脸消失时间',
+      dataIndex: 'FaceDisAppearTime',
+      render: (text: string) => <span>{timeToFormatTime(text)}</span>,
+    },
+    {
+      title: '图片',
+      render: (_, record: Gallery.FaceObject) => (
+        <Space size="middle">
+          {record.SubImageList?.SubImageInfoObject.map(
+            (item: Gallery.SubImageInfoObject, index: number) => (
+              <Image
+                key={item.ImageID}
+                src={`${getImgURL(item.Data)}?h=40`}
+                preview={{
+                  src: getImgURL(item.Data),
+                }}
+              />
+            ),
+          )}
+        </Space>
+      ),
+    },
+    {
+      title: '操作',
+      fixed: 'right',
+      render: (text, record: Gallery.FaceObject) => (
+        <Space size="middle">
+          <Tooltip title="删除图片">
+            <Popconfirm
+              title={<p>确定删除图片吗?</p>}
+              onConfirm={() => {
+                delMutate(record.FaceID);
+              }}
+            >
+              <Button
+                type="dashed"
+                loading={loadings.includes(record.FaceID)}
+                danger
+                icon={<DeleteOutlined />}
+              />
+            </Popconfirm>
+          </Tooltip>
+        </Space>
+      ),
+    },
+  ];
+
   const [pagination, setPagination] = useState<Gallery.Pager>({
     PageRecordNum: 100,
     RecordStartNo: 1,
     DeviceID: sharedData.deviceID || '',
+    start_at: sharedData.searchTimeValue?.start,
+    end_at: sharedData.searchTimeValue?.end,
   });
 
   const { data: galleryList, isLoading: galleryLoading } =
@@ -32,6 +127,16 @@ const Face: React.FC = () => {
         onError: ErrorHandle,
       },
     );
+
+  //监听搜索值变化
+  useUpdateEffect(() => {    
+    setPagination({
+      ...pagination,
+      DeviceID: sharedData.searchIdValue ?? sharedData.deviceID,
+      start_at: sharedData.searchTimeValue?.start,
+      end_at: sharedData.searchTimeValue?.end,
+    });
+  }, [sharedData.searchIdValue, sharedData.searchTimeValue]);
 
   //开启多选 显示复选框
   const [openCheckbox, setOpenCheckbox] = useState<boolean>(false);
@@ -83,6 +188,9 @@ const Face: React.FC = () => {
 
   // 单个删除
   const { mutate: delMutate } = useMutation(DelFace, {
+    onMutate: (v: string) => {
+      setLoadings([...loadings, v]);
+    },
     onSuccess: (res: AxiosResponse) => {
       message.success('删除成功');
       queryClient.invalidateQueries([findFace]);
@@ -91,7 +199,7 @@ const Face: React.FC = () => {
   });
   return (
     <div>
-      <Spin spinning={galleryLoading}>
+      <Affix offsetTop={0}>
         <SelectControl
           isLoading={delFacesLoading}
           openCheckbox={openCheckbox}
@@ -103,32 +211,50 @@ const Face: React.FC = () => {
           onCheckReverse={onCheckReverse}
           onOpenCheckbox={onOpenCheckbox}
         />
-
-        <div className="grid-fill">
-          {galleryList?.FaceListObject.FaceObject.length ? (
-            galleryList?.FaceListObject.FaceObject.map(
-              (item: Gallery.FaceObject) => (
-                <CardBox
-                  key={item.FaceID}
-                  data={item}
-                  showCheck={openCheckbox}
-                  checkList={checkList}
-                  infoLableKey={['FaceID', 'FaceAppearTime']}
-                  onCheck={onCheck}
-                  onClickDel={delMutate}
-                />
-              ),
-            )
+      </Affix>
+      <Spin spinning={galleryLoading}>
+        {sharedData.viewType === 'card' ? (
+          galleryList?.FaceListObject.FaceObject.length ? (
+            <>
+              <div className="grid-fill">
+                {galleryList?.FaceListObject.FaceObject.map(
+                  (item: Gallery.FaceObject) => (
+                    <CardBox
+                      key={item.FaceID}
+                      data={item}
+                      showCheck={openCheckbox}
+                      checkList={checkList}
+                      infoLableKey={['FaceID', 'FaceAppearTime']}
+                      onCheck={onCheck}
+                      onClickDel={delMutate}
+                    />
+                  ),
+                )}
+              </div>
+              <Divider />
+            </>
           ) : (
             <Empty
-              style={{ width: '100%', height: '100%' }}
+              style={{ width: '100%' }}
               image={Empty.PRESENTED_IMAGE_SIMPLE}
             />
-          )}
-        </div>
-        <Divider className="mb-3" />
+          )
+        ) : (
+          <div className="h-full">
+            <Table
+              key={'faceTabel'}
+              pagination={{
+                position: ['none'],
+                total: galleryList?.FaceListObject.TotalNum,
+                pageSize: pagination.PageRecordNum,
+              }}
+              columns={columns}
+              dataSource={galleryList?.FaceListObject.FaceObject}
+            />
+          </div>
+        )}
 
-        <div className="flex justify-end">
+        <div className="flex justify-end mt-3">
           <Pagination
             showSizeChanger
             defaultCurrent={1}

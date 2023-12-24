@@ -6,15 +6,15 @@ import { Button, Space, Tooltip } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 
 import Box from '@/components/box/Box';
-import { shortenString } from '@/package/string/string';
 import { FindNotifies, findNotifies } from '@/services/http/cascade';
 import { ErrorHandle } from '@/services/http/http';
 import { TagsOutlined } from '@ant-design/icons';
 import { useSearchParams } from '@umijs/max';
 import { AxiosResponse } from 'axios';
 import InfoModal, { InfoModalRef } from './components/InfoModal';
+import { timeToFormatTime } from '@/package/time/time';
 
-const Dispositions: React.FC = () => {
+const Notification: React.FC = () => {
   const [searchParams, _] = useSearchParams();
   const deviceID = searchParams.get('device_id') ?? '';
 
@@ -23,13 +23,7 @@ const Dispositions: React.FC = () => {
       title: 'ID',
       dataIndex: 'id',
       align: 'center',
-      ellipsis: {
-        showTitle: false,
-      },
-      width: 130,
-      render: (text: string) => (
-        <Tooltip title={text}>{shortenString(text)}</Tooltip>
-      ),
+      width: 230,
     },
     {
       title: '订阅ID',
@@ -46,12 +40,15 @@ const Dispositions: React.FC = () => {
       title: '通知结果',
       dataIndex: 'result',
       align: 'center',
-      render:(text:string)=> (<span className={text == 'OK' ? 'text-green-500' :''}>{text}</span>)
+      render: (text: string) => (
+        <span className={text == 'OK' ? 'text-green-500' : ''}>{text}</span>
+      ),
     },
     {
       title: '通知时间',
       dataIndex: 'trigger_time',
       align: 'center',
+      render: (text: string) => <span>{timeToFormatTime(text)}</span>,
     },
     {
       title: '操作',
@@ -61,7 +58,14 @@ const Dispositions: React.FC = () => {
       render: (text: string, record: Cascade.NotifyItem) => {
         return (
           <Space>
-            <Button onClick={()=>infoModalRef.current?.openModal(record.ext,record.info_ids)} icon={<TagsOutlined />} />
+            <Tooltip title="通知详情">
+              <Button
+                onClick={() =>
+                  infoModalRef.current?.openModal(record, record.info_ids)
+                }
+                icon={<TagsOutlined />}
+              />
+            </Tooltip>
           </Space>
         );
       },
@@ -112,4 +116,4 @@ const Dispositions: React.FC = () => {
   );
 };
 
-export default Dispositions;
+export default Notification;

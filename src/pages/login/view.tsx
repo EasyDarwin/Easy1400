@@ -62,11 +62,11 @@ export default function Page() {
 
   const { mutate: handleLogin, isLoading: loginLoading } = useMutation(Login, {
     onSuccess: (res: any) => {
-      setToken(res.data.token, res.data.user.id);
+      setToken(res.data.token, res.data.user.id,res.data.user.username);
       history.push('/home');
       welcomeMessage();
     },
-    onError: (error) => {
+    onError: (error:Error) => {
       refetch();
       ErrorHandle(error);
     },
@@ -86,13 +86,13 @@ export default function Page() {
             layout="vertical"
             form={form}
             onFinish={(v: ILoginParams) => {
-              let data = { ...v, captcha_id: captchaData!.captcha_id };
+              let data = { ...v,username:v.username.trim(),password:v.password.trim(), captcha_id: captchaData!.captcha_id };
               handleLogin(data);
             }}
           >
             <div>
               <div className="mt-2">
-                <Form.Item label="账户" name="username" initialValue={'admin'}>
+                <Form.Item label="账户" name="username">
                   <Input />
                 </Form.Item>
               </div>
@@ -100,7 +100,7 @@ export default function Page() {
 
             <div>
               <div className="mt-2">
-                <Form.Item label="密码:" name="password" initialValue={'admin'}>
+                <Form.Item label="密码:" name="password">
                   <Input.Password autoComplete="current-password" />
                 </Form.Item>
               </div>
@@ -108,11 +108,10 @@ export default function Page() {
 
             <div>
               <div className="mt-2 flex justify-between items-center">
-                <Form.Item label="验证码:" name="captcha" initialValue={''}>
+                <Form.Item label="验证码:" name="captcha">
                   <Input
                     className="xl:w-[280px]"
                     autoComplete="current-password"
-                    type="password"
                   />
                 </Form.Item>
                 <div className="ml-1">

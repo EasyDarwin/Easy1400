@@ -1,4 +1,5 @@
 import Box from '@/components/box/Box';
+import CopyIcon from '@/components/copy/CopyIcon';
 import { ErrorHandle } from '@/services/http/http';
 import { FindSystemInfo } from '@/services/http/system';
 import { useQuery } from '@umijs/max';
@@ -18,22 +19,62 @@ const View = () => {
     {
       key: '1',
       label: '视图库用户名',
-      children: data?.username ?? '',
+      children: (
+        <span>
+          {data?.username ?? ''}
+          <CopyIcon value={data?.username} />
+        </span>
+      ),
     },
     {
       key: '2',
       label: '视图库密码',
-      children: data?.password ?? '',
+      children: (
+        <span>
+          {data?.password ?? ''}
+          <CopyIcon value={data?.password} />
+        </span>
+      ),
     },
     {
       key: '3',
       label: '服务器启动时间',
-      children: data?.start_at ?? '',
+      children: (
+        <span>
+          {data?.start_at ?? ''}
+          <CopyIcon value={data?.start_at} />
+        </span>
+      ),
     },
     {
       key: '4',
       label: '版本号',
-      children: data?.version ?? '',
+      children: (
+        <span>
+          {data?.version ?? ''}
+          <CopyIcon value={data?.version} />
+        </span>
+      ),
+    },
+    {
+      key: '5',
+      label: '服务器地址',
+      children: (
+        <span>
+          {data?.host ?? ''}
+          <CopyIcon value={data?.host} />
+        </span>
+      ),
+    },
+    {
+      key: '6',
+      label: '服务器端口',
+      children: (
+        <span>
+          {data?.port ?? ''}
+          <CopyIcon value={data?.port} />
+        </span>
+      ),
     },
   ];
 

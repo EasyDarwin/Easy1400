@@ -40,7 +40,7 @@ push:
 	@scp dist.tar.gz box3:/home/box3/apps/gat1400
 	@rm -rf ./dist
 	@rm -rf dist.tar.gz
-	@ssh box3 'cd /home/box3/apps/gat1400 && tar -zxvf dist.tar.gz && rm -rf dist.tar.gz && rm -rf www && mv dist www'
+	@ssh box3 'cd /home/box3/apps/gat1400 && tar -zxvf dist.tar.gz && rm -rf dist.tar.gz && rm -rf www/* && mv dist/* www'
 
 
 addpage:
