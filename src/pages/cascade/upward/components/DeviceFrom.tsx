@@ -123,6 +123,7 @@ const CascadeFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
             }}
             onChange={onChange}
             render={(item) => item.title}
+            pagination
           />
         </Form.Item>
         <Typography.Text type="secondary">默认共享所有设备</Typography.Text>

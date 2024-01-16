@@ -48,7 +48,7 @@ const FooterContent: React.FC = () => {
         trigger={['click']}
       >
         <Button
-          className="flex items-center"
+          className="flex items-center "
           type="text"
           onClick={(e) => e.preventDefault()}
         >
@@ -58,7 +58,7 @@ const FooterContent: React.FC = () => {
             icon={<UserOutlined />}
           >
           </Avatar>
-          <span className="text-md font-semibold px-2">
+          <span className="text-md font-semibold px-2 ">
             {sessionStorage.getItem(username)}
           </span>
         </Button>

@@ -94,6 +94,11 @@ export default defineConfig({
           path: '/system/cron',
           component: 'system/cron/view',
         },
+        {
+          name: '导入记录',
+          path: '/system/importhistory',
+          component: 'system/import/view',
+        },
       ],
     },
     {

@@ -1,107 +1,93 @@
-import { getImgURL } from '@/package/path/path';
-import { timeToFormatTime } from '@/package/time/time';
-import { findGalleryData } from '@/services/http/gallery';
-import { ErrorHandle } from '@/services/http/http';
+import { FindDownwardNotificationJson } from '@/services/http/cascade';
 import { Descriptions, DescriptionsProps, Image, Modal, Spin } from 'antd';
 import { AxiosResponse } from 'axios';
 import React, {
   forwardRef,
-  useEffect,
   useImperativeHandle,
   useRef,
   useState,
 } from 'react';
+import ReactJson from 'react-json-view';
 
 export interface InfoModalRef {
-  openModal: (data: Cascade.NotifyItem, key: string) => void;
+  openModal: (data: Cascade.DownwardNotificationItem) => void;
 }
 
-//TODO 这里可以共用一个组件，后面优化
+//TODO 这里因为接口需求，需要根据不同字段取出不同的值
 const InfoModal: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
   useImperativeHandle(ref, () => ({
-    openModal: (data: Cascade.NotifyItem, key: string) => {
+    openModal: (data: Cascade.DownwardNotificationItem) => {
+      getJson(data.Path);
       setData(data);
-      mapKey.current = key;
       setIsModalOpen(true);
     },
   }));
 
-  const [data, setData] = useState<Cascade.NotifyItem>();
-  const mapKey = useRef('');
+  const [data, setData] = useState<Cascade.DownwardNotificationItem>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const items: DescriptionsProps['items'] = [
     {
       key: '1',
-      label: '通知ID',
-      children: data?.notification_id,
+      label: '订阅ID',
+      children: data?.SubscribeID,
     },
+
     {
       key: '2',
-      label: mapKey.current == 'DeviceList' ? '设备ID' : "图库ID",
-      children: data?.object_id,
-    },
-    {
-      key: '3',
-      label: '通知状态',
-      children: data?.result,
-    },
-    {
-      key: '4',
       label: '触发时间',
-      children: timeToFormatTime(data?.trigger_time ?? ''),
+      children: data?.CreatedAt,
     },
   ];
 
   const objectKeyList = useRef<string[]>([]);
   const [imgData, setImageData] = useState<Gallery.SubImageList>();
-
-  const saveData = (url: string) => {
-    setIsLoading(true);
-    findGalleryData({
-      url: url,
-      id: data?.object_id ?? '',
-    })
-      .then((res: AxiosResponse) => {
-        setIsLoading(false);
-        setImageData(
-          res.data[objectKeyList.current[0]][objectKeyList.current[1]][0]
-            .SubImageList,
-        );
-      })
-      .catch((error: Error) => {
-        setIsLoading(false);
-        ErrorHandle(error);
-      });
+  const key = useRef('');
+  const getJson = (url: string) => {
+    FindDownwardNotificationJson(url).then((res: AxiosResponse) => {
+      getDataList(res.data.InfoIDs);
+      key.current = res.data.InfoIDs;
+      const ImageData =
+        res.data[objectKeyList.current[0]][objectKeyList.current[1]][
+          objectKeyList.current[2]
+        ];
+      if (ImageData.length != 0) {
+        setImageData(ImageData[0].SubImageList);
+      } else {
+        setImageData(undefined);
+      }
+    });
   };
 
-  useEffect(() => {
-    getDataList();
-  }, [mapKey.current]);
-
-  const getDataList = () => {
-    switch (mapKey.current) {
+  const getDataList = (key: string) => {
+    switch (key) {
       case 'DeviceList':
         return;
       case 'FaceObjectList':
-        saveData('/VIID/Faces');
-        objectKeyList.current = ['FaceListObject', 'FaceObject'];
+        objectKeyList.current = [
+          'FaceObjectList',
+          'FaceListObject',
+          'FaceObject',
+        ];
         return;
       case 'PersonObjectList':
-        saveData('/VIID/Persons');
-        objectKeyList.current = ['PersonListObject', 'PersonObject'];
+        objectKeyList.current = [
+          'PersonObjectList',
+          'PersonListObject',
+          'PersonObject',
+        ];
         return;
       case 'MotorVehicleObjectList':
-        saveData('/VIID/MotorVehicles');
         objectKeyList.current = [
+          'MotorVehicleObjectList',
           'MotorVehicleListObject',
           'MotorVehicleObject',
         ];
         return;
       case 'NonMotorVehicleObjectList':
-        saveData('/VIID/NonMotorVehicles');
         objectKeyList.current = [
+          'NonMotorVehicleObjectList',
           'NonMotorVehicleListObject',
           'NonMotorVehicleObject',
         ];
@@ -112,6 +98,7 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
   };
 
   const onCancel = () => {
+    key.current = ''
     setIsModalOpen(false);
   };
 
@@ -125,27 +112,30 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
       centered
     >
       <Spin spinning={isLoading} />
-
-      <div className="py-4">
-        <Descriptions column={2} items={items} />
-      </div>
-
-      {mapKey.current !== 'DeviceList' && (
-        <div className="flex justify-evenly">
-          {imgData?.SubImageInfoObject.map(
-            (item: Gallery.SubImageInfoObject) => (
-              <Image
-                key={item.ImageID}
-                onError={(e: any) => {
-                  e.target.src = './noImg.png';
-                }}
-                src={`${getImgURL(item.Data)}?h=300`}
-                preview={{
-                  src: getImgURL(item.Data),
-                }}
-              ></Image>
-            ),
-          )}
+      {key.current !== 'DeviceList' && (
+        <>
+          <div className="py-4">
+            <Descriptions column={2} items={items} />
+          </div>
+          <div className="flex justify-evenly">
+            {imgData?.SubImageInfoObject.map(
+              (item: Gallery.SubImageInfoObject) => (
+                <Image
+                  key={item.ImageID}
+                  onError={(e: any) => {
+                    e.target.src = './noImg.png';
+                  }}
+                  style={{ height: '200px' }}
+                  src={`data:image/jpeg;base64,${item.Data}`}
+                ></Image>
+              ),
+            )}
+          </div>
+        </>
+      )}
+      {key.current === 'DeviceList' && (
+        <div className=" whitespace-normal overflow-auto">
+          <ReactJson src={data || {}}></ReactJson>
         </div>
       )}
     </Modal>

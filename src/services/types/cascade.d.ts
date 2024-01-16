@@ -310,4 +310,16 @@ declare namespace Cascade {
     size?: number;
     subscribe_id?: string;
   }
+  type DownwardNotificationRes = {
+    items:DownwardNotificationItem[];
+    total:number;
+  }
+
+  type DownwardNotificationItem = {
+    CreatedAt:string;
+    FormID?:string;
+    ID:string;
+    Path:string;
+    SubscribeID:string;
+  }
 }

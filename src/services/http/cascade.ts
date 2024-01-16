@@ -124,6 +124,11 @@ export async function FindDownwardNotification(
 }
 
 //删除通知
-export async function DelDownwardNotification(id: number) {
+export async function DelDownwardNotification(id: string) {
   return await DELETE(`/subscribes/notifications/${id}`);
+}
+
+//获取下级通知详情
+export async function FindDownwardNotificationJson(url:string) {
+  return await GET(`${url}`);
 }

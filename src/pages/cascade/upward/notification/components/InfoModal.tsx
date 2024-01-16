@@ -65,10 +65,12 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
     })
       .then((res: AxiosResponse) => {
         setIsLoading(false);
-        setImageData(
-          res.data[objectKeyList.current[0]][objectKeyList.current[1]][0]
-            .SubImageList,
-        );
+        const ImageData = res.data[objectKeyList.current[0]][objectKeyList.current[1]]
+        if(ImageData.length != 0){
+          setImageData(ImageData[0].SubImageList);
+        }else{
+          setImageData(undefined)
+        }
       })
       .catch((error: Error) => {
         setIsLoading(false);
@@ -114,6 +116,7 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
   };
 
   const onCancel = () => {
+    mapKey.current = '';
     setIsModalOpen(false);
   };
 

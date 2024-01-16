@@ -40,14 +40,14 @@ const Notification: React.FC = () => {
       align: 'center',
       fixed: 'right',
       width: 100,
-      render: (_: string, record: Cascade.NotifyItem) => {
+      render: (_: string, record: Cascade.DownwardNotificationItem) => {
         return (
           <Space>
             <Tooltip title="通知详情">
               <Button
-                onClick={() =>{}
-                  // infoModalRef.current?.openModal(record, record.info_ids)
-                }
+                onClick={() => {
+                  infoModalRef.current?.openModal(record);
+                }}
                 icon={<TagsOutlined />}
               />
             </Tooltip>
@@ -56,16 +56,16 @@ const Notification: React.FC = () => {
                 title={
                   <p>
                     确定删除
-                    <span className="text-red-500"> {record.id} </span>
+                    <span className="text-red-500"> {record.ID} </span>
                     通知吗?
                   </p>
                 }
                 onConfirm={() => {
-                  deleteCascadeMutate(record.id);
+                  deleteCascadeMutate(record.ID);
                 }}
               >
                 <Button
-                  loading={loadings.includes(record.id)}
+                  loading={loadings.includes(record.ID)}
                   type="dashed"
                   danger
                   icon={<DeleteOutlined />}
@@ -81,9 +81,9 @@ const Notification: React.FC = () => {
   const infoModalRef = useRef<InfoModalRef>();
 
   //删除通知记录
-  const [loadings, setLoadings] = useState<number[]>([]);
+  const [loadings, setLoadings] = useState<string[]>([]);
   const { mutate: deleteCascadeMutate } = useMutation(DelDownwardNotification, {
-    onMutate: (v: number) => {
+    onMutate: (v: string) => {
       setLoadings([...loadings, v]);
     },
     onSuccess(res: AxiosResponse) {
@@ -107,7 +107,7 @@ const Notification: React.FC = () => {
     data: subscribesData,
     isLoading: subscribesLoading,
     refetch,
-  } = useQuery<Cascade.NotifyListRes>(
+  } = useQuery<Cascade.DownwardNotificationRes>(
     [findDownwardNotification, pagination],
     () =>
       FindDownwardNotification(pagination).then(

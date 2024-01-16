@@ -37,23 +37,23 @@ export async function EditMaxCollectNum(data: {
 }
 
 //导出 excel 表格
-export async function ExportDevice() {
-  return await GET(`/devices/export`);
+export async function ExportDevice(ids:string) {
+  return await GET(`/devices/export`,{ids:ids});
 }
 
 //导入 设备列表
 export async function ImportDevice(data: FormData) {
-  return await POST(`/devices/import`, data,undefined,{'Content-Type': 'multipart/form-data'},'blob');
+  return await POST(`/devices/import`, data,undefined,{'Content-Type': 'multipart/form-data'});
 }
 
 
 //获取导入历史
 export const findImportHistory = 'FindImportHistory';
 export async function FindImportHistory(data:Device.FindImportHistoryReq) {
-  return await GET(`/devices/history`, data);
+  return await GET<Device.FindImportHistoryRes>(`/devices/history`, data);
 }
 
 //获取导入详情
-export async function FindImportDetail(id:string) {
-  return await GET(`/devices/history/${id}`);
+export async function FindImportDetail(id:number) {
+  return await GET<Device.ImportHistoryItem>(`/devices/history/${id}`);
 }

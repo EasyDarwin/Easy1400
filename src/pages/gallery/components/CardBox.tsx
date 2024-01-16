@@ -13,6 +13,7 @@ import {
 import React, { useContext, useRef, useState } from 'react';
 import SharedDataContext from './SharedDataContext';
 import CopyIcon from '@/components/copy/CopyIcon';
+import { getImgURL } from '@/package/path/path';
 
 interface ICardBoxProps {
   data: any;
@@ -44,14 +45,6 @@ const CardBox: React.FC<ICardBoxProps> = ({
     index: 0,
   });
   const imageList = useRef<any[]>([]);
-
-  const getImgURL = (path: string) => {
-    if (path.startsWith('http')) {
-      return path;
-    }
-
-    return `${window.location.origin}${process.env.BASEURL}${path}`;
-  };
 
   //map对照
   const findObjectByKey = (): string => {

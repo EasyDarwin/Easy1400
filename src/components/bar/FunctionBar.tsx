@@ -1,4 +1,4 @@
-import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
+import { DownloadOutlined } from '@ant-design/icons';
 import { Button, Col, Row, Upload, UploadProps } from 'antd';
 
 import React, { useState } from 'react';
@@ -18,7 +18,11 @@ export interface ISearchComponent {
   onSearch: (value: string) => void;
 }
 
-export interface IUploadProps {props:UploadProps,title:string;isLoading:boolean;}
+export interface IUploadProps {
+  props: UploadProps;
+  title: string;
+  isLoading: boolean;
+}
 
 interface IFunctionBarPorps {
   btnChannle: ButtonList[];
@@ -28,6 +32,7 @@ interface IFunctionBarPorps {
   isBar?: boolean; //是否开启单选模式
   uploadProps?: IUploadProps;
   isUpload?: boolean; //是否开启上传模式
+  btnPosition?: React.ReactNode;
 }
 
 const FunctionBar: React.FC<IFunctionBarPorps> = ({
@@ -38,6 +43,7 @@ const FunctionBar: React.FC<IFunctionBarPorps> = ({
   isBar = true,
   uploadProps,
   isUpload = false,
+  btnPosition,
 }) => {
   const [selectedID, setSelectedID] = useState(0);
 
@@ -64,10 +70,18 @@ const FunctionBar: React.FC<IFunctionBarPorps> = ({
             ))}
             {isUpload && (
               <Upload {...uploadProps?.props}>
-                <Button className='rounded-l-none' type='primary' loading={uploadProps?.isLoading} icon={<DownloadOutlined />}>{uploadProps?.title}</Button>
+                <Button
+                  className="rounded-l-none"
+                  type="primary"
+                  loading={uploadProps?.isLoading}
+                  icon={<DownloadOutlined />}
+                >
+                  {uploadProps?.title}
+                </Button>
               </Upload>
             )}
           </Button.Group>
+          {btnPosition}
         </Col>
         <Col span={span[1]} className={rigthChannleClass}>
           {rigthChannle}

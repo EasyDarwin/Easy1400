@@ -37,13 +37,44 @@ declare namespace Device {
     PositionType: string | any;
     RegisteredAt: string;
     UserId: string;
-    CurrentCount:number;
-    MaxCount:number;
+    CurrentCount: number;
+    MaxCount: number;
   };
 
   type FindImportHistoryReq = {
     page?: number;
     size?: number;
     type?: string;
+  };
+
+  type FindImportHistoryRes = {
+    items: ImportHistoryItem[];
+    total: number;
+  };
+
+  type ImportHistoryItem = {
+    created_at: string;
+    creator: string;
+    id: number;
+    overview: Overview;
+    result: {items:ImportHistoryResult[]};
+    type: string;
+  };
+
+  type Overview = {
+    failure: number;
+    success: number;
+  };
+
+  type ImportHistoryResult = {
+     error: string; line: number ;
+  };
+
+  type ImportMessage = {
+    total: number;
+    current:number;
+    success:number;
+    failure:number;
+    err?:string
   }
 }

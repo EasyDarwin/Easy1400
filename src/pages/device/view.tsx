@@ -16,7 +16,16 @@ import {
 } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import { history, useMutation, useQuery } from '@umijs/max';
-import { Button, Popconfirm, Space, Table, Tag, Tooltip, message } from 'antd';
+import {
+  Button,
+  Popconfirm,
+  Space,
+  Table,
+  Tag,
+  Tooltip,
+  Typography,
+  message,
+} from 'antd';
 import Search from 'antd/es/input/Search';
 import { ColumnsType } from 'antd/es/table';
 import { AxiosResponse } from 'axios';
@@ -27,8 +36,8 @@ import Box from '@/components/box/Box';
 import CopyBtn from '@/components/copy/CopyBtn';
 import { POLLING_TIME } from '@/constants/index';
 import DeviceFrom from './components/DeviceFrom';
+import ImportFrom, { IImportFromProps } from './components/ImportFrom';
 import QuantityFrom, { IQuantityFromProps } from './components/QuantityFrom';
-import ImportFrom,{IImportFromProps} from './components/ImportFrom';
 
 interface IDeviceFrom {
   setFieldsValue: (data?: Device.APEObject, isEdit?: boolean) => void;
@@ -38,7 +47,7 @@ const View: React.FC = () => {
   const deviceFromRef = useRef<IDeviceFrom>();
   const quantityFromRef = useRef<IQuantityFromProps>();
   const importFromRef = useRef<IImportFromProps>();
-  
+
   const columns: ColumnsType<Device.APEObject> = [
     {
       title: 'ID',
@@ -217,7 +226,7 @@ const View: React.FC = () => {
     },
     onSuccess: (data: AxiosResponse) => {
       message.success('删除成功');
-      setLoadings((v) => v.filter((item) => item !== data.data.id));
+      setLoadings((v) => v.filter((item) => item !== data.data.ID));
       refetch();
     },
     onError: (error: Error) => {
@@ -262,7 +271,11 @@ const View: React.FC = () => {
         a.download = fileName;
         a.click();
       },
-      onError: ErrorHandle,
+      onError: (error: Error) => {
+        console.log(error);
+
+        ErrorHandle(error);
+      },
     });
 
   const funcBtnList: ButtonList[] = [
@@ -274,19 +287,22 @@ const View: React.FC = () => {
       onClick: onAddBtnClick,
     },
     {
-      label: '导出',
-      loading: exprotExcelLoading,
-      type: 'primary',
-      icon: <UploadOutlined />,
-      onClick: exprotExcelMutate,
-    },
-    {
       label: '导入',
       loading: false,
       type: 'primary',
       icon: <DownloadOutlined />,
       onClick: () => {
-        importFromRef.current?.openModalvisible()
+        importFromRef.current?.openModalvisible();
+      },
+    },
+    {
+      label: '导出',
+      loading: exprotExcelLoading,
+      type: 'primary',
+      icon: <UploadOutlined />,
+      onClick: () => {
+        const data = checkList?.join() || '';
+        exprotExcelMutate(data);
       },
     },
   ];
@@ -301,12 +317,32 @@ const View: React.FC = () => {
       }}
     />
   );
+
+  //多选
+  const [checkList, setCheckList] = useState<React.Key[]>();
+  const rowSelection = {
+    onChange: (selectedRowKeys: React.Key[]) => {
+      setCheckList(selectedRowKeys);
+    },
+  };
+
+  const btnPositionComponet = (
+    <>
+      {checkList && checkList?.length > 0 && (
+        <Typography.Text type="secondary" className="ml-3">
+          已勾选 {checkList?.length} 项
+        </Typography.Text>
+      )}
+    </>
+  );
+
   return (
     <PageContainer title={process.env.PAGE_TITLE}>
       <Box>
         <FunctionBar
           rigthChannle={funcSearchComponet}
           btnChannle={funcBtnList}
+          btnPosition={btnPositionComponet}
           rigthChannleClass="flex justify-end"
         />
       </Box>
@@ -318,6 +354,10 @@ const View: React.FC = () => {
           scroll={{ x: 1300 }}
           columns={columns}
           dataSource={deviceData?.APEListObject.APEObject}
+          rowSelection={{
+            type: 'checkbox',
+            ...rowSelection,
+          }}
           pagination={{
             total: deviceData?.APEListObject.TotalNum,
             pageSize: pagination.PageRecordNum,
@@ -337,7 +377,7 @@ const View: React.FC = () => {
       </Box>
       <DeviceFrom ref={deviceFromRef} />
       <QuantityFrom ref={quantityFromRef} />
-      <ImportFrom ref={importFromRef}/>
+      <ImportFrom ref={importFromRef} />
     </PageContainer>
   );
 };
