@@ -1,5 +1,5 @@
 import { FindDownwardNotificationJson } from '@/services/http/cascade';
-import { Descriptions, DescriptionsProps, Image, Modal, Spin } from 'antd';
+import { Image, Modal, Spin } from 'antd';
 import { AxiosResponse } from 'axios';
 import React, {
   forwardRef,
@@ -24,22 +24,9 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
   }));
 
   const [data, setData] = useState<Cascade.DownwardNotificationItem>();
+  const [deviceID, setDeviceID] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  const items: DescriptionsProps['items'] = [
-    {
-      key: '1',
-      label: '订阅ID',
-      children: data?.SubscribeID,
-    },
-
-    {
-      key: '2',
-      label: '触发时间',
-      children: data?.CreatedAt,
-    },
-  ];
 
   const objectKeyList = useRef<string[]>([]);
   const [imgData, setImageData] = useState<Gallery.SubImageList>();
@@ -48,12 +35,15 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
     FindDownwardNotificationJson(url).then((res: AxiosResponse) => {
       getDataList(res.data.InfoIDs);
       key.current = res.data.InfoIDs;
-      const ImageData =
+      const data =
         res.data[objectKeyList.current[0]][objectKeyList.current[1]][
           objectKeyList.current[2]
         ];
-      if (ImageData.length != 0) {
-        setImageData(ImageData[0].SubImageList);
+      console.log(data);
+
+      if (data.length != 0) {
+        setDeviceID(data[0].DeviceID);
+        setImageData(data[0].SubImageList);
       } else {
         setImageData(undefined);
       }
@@ -98,40 +88,36 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
   };
 
   const onCancel = () => {
-    key.current = ''
+    key.current = '';
     setIsModalOpen(false);
   };
 
   return (
     <Modal
-      title="通知详情"
+      title={`设备ID ${deviceID}`}
       open={isModalOpen}
       onCancel={onCancel}
       footer={null}
-      width="60%"
       centered
+      width="60%"
     >
       <Spin spinning={isLoading} />
       {key.current !== 'DeviceList' && (
-        <>
-          <div className="py-4">
-            <Descriptions column={2} items={items} />
-          </div>
-          <div className="flex justify-evenly">
-            {imgData?.SubImageInfoObject.map(
-              (item: Gallery.SubImageInfoObject) => (
+        <div className="flex py-2">
+          {imgData?.SubImageInfoObject.map(
+            (item: Gallery.SubImageInfoObject) => (
+              <div key={item.ImageID} className="mr-5">
                 <Image
-                  key={item.ImageID}
                   onError={(e: any) => {
                     e.target.src = './noImg.png';
                   }}
-                  style={{ height: '200px' }}
+                  style={{ height: '300px' }}
                   src={`data:image/jpeg;base64,${item.Data}`}
                 ></Image>
-              ),
-            )}
-          </div>
-        </>
+              </div>
+            ),
+          )}
+        </div>
       )}
       {key.current === 'DeviceList' && (
         <div className=" whitespace-normal overflow-auto">

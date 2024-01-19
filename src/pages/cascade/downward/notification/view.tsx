@@ -31,6 +31,14 @@ const Notification: React.FC = () => {
       },
     },
     {
+      title: '订阅ID',
+      dataIndex: 'SubscribeID',
+      align: 'center',
+      ellipsis: {
+        showTitle: false,
+      },
+    },
+    {
       title: '通知时间',
       dataIndex: 'CreatedAt',
       align: 'center',

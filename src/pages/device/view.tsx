@@ -35,6 +35,7 @@ import FunctionBar, { ButtonList } from '@/components/bar/FunctionBar';
 import Box from '@/components/box/Box';
 import CopyBtn from '@/components/copy/CopyBtn';
 import { POLLING_TIME } from '@/constants/index';
+import { downloadByData } from '@/package/download/download';
 import DeviceFrom from './components/DeviceFrom';
 import ImportFrom, { IImportFromProps } from './components/ImportFrom';
 import QuantityFrom, { IQuantityFromProps } from './components/QuantityFrom';
@@ -263,17 +264,9 @@ const View: React.FC = () => {
     useMutation(ExportDevice, {
       onSuccess: (res: AxiosResponse) => {
         const fileName = res.headers['content-disposition'].split('=')[1];
-        const blob = new Blob([res.data], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        // TODO 这里a链接浅封装一下 支持下载完成后删除
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        a.click();
+        downloadByData(res.data, fileName, 'text/csv;charset=gbk;');
       },
       onError: (error: Error) => {
-        console.log(error);
-
         ErrorHandle(error);
       },
     });
