@@ -264,7 +264,8 @@ const View: React.FC = () => {
     useMutation(ExportDevice, {
       onSuccess: (res: AxiosResponse) => {
         const fileName = res.headers['content-disposition'].split('=')[1];
-        downloadByData(res.data, fileName, 'text/plain;charset=GBK');
+        const fileType = res.headers['content-type'];
+        downloadByData(res.data, fileName, fileType);
       },
       onError: (error: Error) => {
         ErrorHandle(error);
