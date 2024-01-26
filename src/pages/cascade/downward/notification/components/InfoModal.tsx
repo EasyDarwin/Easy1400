@@ -1,5 +1,5 @@
 import { FindDownwardNotificationJson } from '@/services/http/cascade';
-import { Image, Modal, Spin } from 'antd';
+import { Image, Modal, Spin, Typography } from 'antd';
 import { AxiosResponse } from 'axios';
 import React, {
   forwardRef,
@@ -25,6 +25,7 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
 
   const [data, setData] = useState<Cascade.DownwardNotificationItem>();
   const [deviceID, setDeviceID] = useState('');
+  const [allData,setAllData] = useState();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -34,13 +35,12 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
   const getJson = (url: string) => {
     FindDownwardNotificationJson(url).then((res: AxiosResponse) => {
       getDataList(res.data.InfoIDs);
+      setAllData(res.data)
       key.current = res.data.InfoIDs;
       const data =
         res.data[objectKeyList.current[0]][objectKeyList.current[1]][
           objectKeyList.current[2]
         ];
-      console.log(data);
-
       if (data.length != 0) {
         setDeviceID(data[0].DeviceID);
         setImageData(data[0].SubImageList);
@@ -119,11 +119,10 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
           )}
         </div>
       )}
-      {key.current === 'DeviceList' && (
-        <div className=" whitespace-normal overflow-auto">
-          <ReactJson src={data || {}}></ReactJson>
-        </div>
-      )}
+      <div className=" whitespace-normal overflow-auto py-2">
+        <Typography.Title level={5}>通知结构</Typography.Title>
+        <ReactJson collapsed={true} src={allData || {}}></ReactJson>
+      </div>
     </Modal>
   );
 });

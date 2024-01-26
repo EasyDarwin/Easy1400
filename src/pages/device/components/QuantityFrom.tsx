@@ -51,18 +51,18 @@ const QuantityFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
         form={form}
         layout="vertical"
         labelAlign="left"
-        labelCol={{ span: 6 }}
+        labelCol={{ span: 24 }}
         onFinish={(v:any) => {mutate(v)}}
       >
         <Form.Item label="设备 ID" name="id">
           <Input placeholder="设备ID" disabled={true} />
         </Form.Item>
         <Form.Item
-          label="最大数量"
+          label={<span className='w-full'>最大数量 <span className='font-mono align-middle text-[12px] text-gray-400'>{'( -1: 不限，0: 不接收; >0: 限制每天接收总数 )'}</span></span>}
           name="max_count"
-          rules={[{ required: true,message:'请输入限制数，如果不需要限制请输入0' }]}
+          rules={[{ required: true,message:'请输入限制数，如果不需要限制请输入-1' }]}
         >
-          <InputNumber className='w-full' placeholder="最大数量 如:300  如果不需要限制请输入0" />
+          <InputNumber className='w-full' placeholder="最大数量 如:300  如果不需要限制请输入-1" />
         </Form.Item>
       </Form>
     </Modal>

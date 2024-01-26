@@ -2,7 +2,7 @@ import { getImgURL } from '@/package/path/path';
 import { timeToFormatTime } from '@/package/time/time';
 import { findGalleryData } from '@/services/http/gallery';
 import { ErrorHandle } from '@/services/http/http';
-import { Descriptions, DescriptionsProps, Image, Modal, Spin } from 'antd';
+import { DescriptionsProps, Image, Modal, Spin, Typography } from 'antd';
 import { AxiosResponse } from 'axios';
 import React, {
   forwardRef,
@@ -11,6 +11,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import ReactJson from 'react-json-view';
 
 export interface InfoModalRef {
   openModal: (data: Cascade.NotifyItem, key: string) => void;
@@ -56,6 +57,7 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
 
   const objectKeyList = useRef<string[]>([]);
   const [imgData, setImageData] = useState<Gallery.SubImageList>();
+  const [allData, setAllData] = useState();
 
   const saveData = (url: string) => {
     setIsLoading(true);
@@ -64,12 +66,14 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
       id: data?.object_id ?? '',
     })
       .then((res: AxiosResponse) => {
+        setAllData(res.data);
         setIsLoading(false);
-        const ImageData = res.data[objectKeyList.current[0]][objectKeyList.current[1]]
-        if(ImageData.length != 0){
+        const ImageData =
+          res.data[objectKeyList.current[0]][objectKeyList.current[1]];
+        if (ImageData.length != 0) {
           setImageData(ImageData[0].SubImageList);
-        }else{
-          setImageData(undefined)
+        } else {
+          setImageData(undefined);
         }
       })
       .catch((error: Error) => {
@@ -130,28 +134,30 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
       centered
     >
       <Spin spinning={isLoading}>
-        <div className="py-4">
-          <Descriptions column={2} items={items} />
-        </div>
-
         {mapKey.current !== 'DeviceList' && (
-          <div className="flex justify-around">
+          <div className="flex py-2">
             {imgData?.SubImageInfoObject.map(
               (item: Gallery.SubImageInfoObject) => (
-                <Image
-                  key={item.ImageID}
-                  onError={(e: any) => {
-                    e.target.src = './noImg.png';
-                  }}
-                  src={`${getImgURL(item.Data)}?h=200`}
-                  preview={{
-                    src: getImgURL(item.Data),
-                  }}
-                ></Image>
+                <div key={item.ImageID} className="mr-5">
+                  <Image
+                    key={item.ImageID}
+                    onError={(e: any) => {
+                      e.target.src = './noImg.png';
+                    }}
+                    src={`${getImgURL(item.Data)}?h=200`}
+                    preview={{
+                      src: getImgURL(item.Data),
+                    }}
+                  ></Image>
+                </div>
               ),
             )}
           </div>
         )}
+        <div className=" whitespace-normal overflow-auto py-2">
+          <Typography.Title level={5}>通知结构</Typography.Title>
+          <ReactJson collapsed={true} src={allData || {}}></ReactJson>
+        </div>
       </Spin>
     </Modal>
   );

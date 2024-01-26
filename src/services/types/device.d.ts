@@ -33,6 +33,7 @@ declare namespace Device {
     Password: string;
     Place: string;
     PlaceCode: string;
+    NoAuth:boolean;
     Port: number;
     PositionType: string | any;
     RegisteredAt: string;

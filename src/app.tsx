@@ -1,6 +1,7 @@
 // 运行时配置
 import { RunTimeLayoutConfig,history } from '@umijs/max';
 import FooterContent from './components/footerContent/FooterContent';
+import Footer from './components/footer/Footer';
 import { LOGIN_PAGE_ROUTE } from './constants';
 import { getToken } from './services/http/http';
 // 全局初始化数据配置，用于 Layout 用户信息和权限初始化
@@ -13,6 +14,7 @@ export const layout:RunTimeLayoutConfig= () => {
   return {
     logo: './favicon.ico',
     rightContentRender: () => <FooterContent />,
+    footerRender:()=><Footer/>
   }
 };
 

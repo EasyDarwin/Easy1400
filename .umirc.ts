@@ -99,6 +99,11 @@ export default defineConfig({
           path: '/system/importhistory',
           component: 'system/import/view',
         },
+        {
+          name: '关于我们',
+          path: '/system/about',
+          component: 'system/about/view',
+        },
       ],
     },
     {

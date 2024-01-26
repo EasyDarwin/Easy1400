@@ -40,7 +40,7 @@ const SubScribes: React.FC = () => {
       align: 'center',
       width: 300,
       render: (_: string, record: Cascade.DownSubscribesListItem) => (
-        <span>{record.Ext?.SubscribeID}</span>
+        <span>{record.id}</span>
       ),
     },
     {
@@ -110,7 +110,7 @@ const SubScribes: React.FC = () => {
             <Button
               onClick={() => {
                 history.push(
-                  `/downward/cascade/subscribes/notification?notification_id=${record.ID}`,
+                  `/downward/cascade/subscribes/notification?notification_id=${record.id}`,
                 );
               }}
               icon={<BellOutlined />}
@@ -122,17 +122,17 @@ const SubScribes: React.FC = () => {
                 <p>
                   确定删除
                   <span className="text-red-500">
-                    {record.Ext?.SubscribeID}
+                    {record.id}
                   </span>
                   吗?
                 </p>
               }
               onConfirm={() => {
-                deleteCascadeMutate(record.ID);
+                deleteCascadeMutate(record.id);
               }}
             >
               <Button
-                loading={loadings.includes(record.ID)}
+                loading={loadings.includes(record.id)}
                 type="dashed"
                 danger
                 disabled={isOnline == 'false'}

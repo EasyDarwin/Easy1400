@@ -1,5 +1,3 @@
-export const DEFAULT_NAME = 'Umi Max';
-
 //登录页路由
 export const LOGIN_PAGE_ROUTE = '/login';
 

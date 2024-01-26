@@ -57,3 +57,8 @@ export async function FindImportHistory(data:Device.FindImportHistoryReq) {
 export async function FindImportDetail(id:number) {
   return await GET<Device.ImportHistoryItem>(`/devices/history/${id}`);
 }
+
+//设置免鉴权
+export async function SetDeviceNoAuth(data: { id: string; auth: boolean }) {
+  return await POST(`/devices/${data.id}/auth/${data.auth}`)
+}

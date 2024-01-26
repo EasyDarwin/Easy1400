@@ -159,7 +159,7 @@ declare namespace Cascade {
     CreatedAt?: string;
     Ext?: DownSubscribesExt;
     FormID?: string;
-    ID: string;
+    id: string;
     IsUP?: boolean;
     result?: string;
     try_count?: number;
@@ -318,7 +318,7 @@ declare namespace Cascade {
   type DownwardNotificationItem = {
     CreatedAt:string;
     FormID?:string;
-    ID:string;
+    id:string;
     Path:string;
     SubscribeID:string;
   }

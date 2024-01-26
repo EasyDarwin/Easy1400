@@ -24,7 +24,7 @@ const Notification: React.FC = () => {
   const columns: ColumnsType<any> = [
     {
       title: 'ID',
-      dataIndex: 'ID',
+      dataIndex: 'id',
       align: 'center',
       ellipsis: {
         showTitle: false,
@@ -40,7 +40,7 @@ const Notification: React.FC = () => {
     },
     {
       title: '通知时间',
-      dataIndex: 'CreatedAt',
+      dataIndex: 'created_at',
       align: 'center',
     },
     {
@@ -64,16 +64,16 @@ const Notification: React.FC = () => {
                 title={
                   <p>
                     确定删除
-                    <span className="text-red-500"> {record.ID} </span>
+                    <span className="text-red-500"> {record.id} </span>
                     通知吗?
                   </p>
                 }
                 onConfirm={() => {
-                  deleteCascadeMutate(record.ID);
+                  deleteCascadeMutate(record.id);
                 }}
               >
                 <Button
-                  loading={loadings.includes(record.ID)}
+                  loading={loadings.includes(record.id)}
                   type="dashed"
                   danger
                   icon={<DeleteOutlined />}

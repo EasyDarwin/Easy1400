@@ -2,13 +2,16 @@ import {
   DelDevice,
   ExportDevice,
   FindDeviceLists,
+  SetDeviceNoAuth,
   getDeviceList,
 } from '@/services/http/device';
 import { ErrorHandle } from '@/services/http/http';
 import {
+  AuditOutlined,
   DeleteOutlined,
   DownloadOutlined,
   EditOutlined,
+  EyeOutlined,
   FilterOutlined,
   PlusOutlined,
   UnorderedListOutlined,
@@ -143,7 +146,7 @@ const View: React.FC = () => {
       dataIndex: 'MaxCount',
       align: 'center',
       width: 110,
-      render: (text: string) => <span>{text || '-'}</span>,
+      render: (text: string) => <span className={text == '0' ? 'text-red-500' : ''}>{text == '-1' ? '-' : text}</span>,
     },
     {
       title: 'IP',
@@ -219,6 +222,22 @@ const View: React.FC = () => {
       },
     },
   ];
+
+  const [authLoading, setAuthLoading] = useState('');
+
+  //开启关闭 免检权
+  const { mutate: noAuthMutate } = useMutation(SetDeviceNoAuth, {
+    onSuccess: () => {
+      setAuthLoading('');
+      refetch();
+      message.success('操作成功');
+    },
+    onError: (error: Error) => {
+      setAuthLoading('');
+      ErrorHandle(error);
+    },
+  });
+
   const [loadings, setLoadings] = useState<string[]>([]);
 
   const { mutate: deleteDeviceMutate } = useMutation(DelDevice, {
