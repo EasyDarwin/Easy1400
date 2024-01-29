@@ -3,7 +3,7 @@ import { Watermark } from 'antd';
 
 const View = () => {
   return (
-    <Watermark gap={[300,300]} font={{color:'#eee'}} content="安徽羚通科技有限公司">
+    <Watermark gap={[300,300]} font={{color:'rgba(190,190,190,.3)	'}} content="安徽羚通科技有限公司">
       <Box>
         <h2 className="py-3">关于我们 :</h2>
         <p className="indent-8 leading-8 subpixel-antialiased whitespace-normal font-mono text-lg">
