@@ -46,11 +46,11 @@ const View = () => {
           </div>
           <div className="flex justify-between items-center ">
             <span className="text-center">
-              <img className="w-52 h-52" src="./羚通公众号.jpg" />
+              <img className="w-52 h-52" src="./lnton_g.jpg" />
               <p>羚通公众号</p>
             </span>
             <span className="text-center">
-              <img className="w-52 h-52" src="./羚通视频号.jpg" />
+              <img className="w-52 h-52" src="./lnton_v.jpg" />
               <p>羚通视频号</p>
             </span>
           </div>
