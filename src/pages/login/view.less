@@ -1,4 +1,14 @@
-
-.title {
-  background: rgb(121, 220, 242);
+// 光圈背景
+.bg-round-light {
+  position: absolute;
+  background:
+    radial-gradient(circle at -10px -20px,
+      rgba(40, 145, 250, 0.8),
+      transparent 25%),
+      radial-gradient(circle at 110% 120%,
+      rgba(250, 40, 222, 0.8),
+      transparent 30%),
+    rgb(226 232 240);
+  backdrop-filter: blur(30px);
+  background-repeat: no-repeat;
 }
