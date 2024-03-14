@@ -132,3 +132,8 @@ export async function DelDownwardNotification(id: string) {
 export async function FindDownwardNotificationJson(url:string) {
   return await GET(`${url}`);
 }
+
+//查询下级设备信息
+export async function FindDownwardDeviceCheck(data:Cascade.DownwardDeviceCheckReq){
+  return await GET<Device.FindReq>(`/platforms/${data.id}/devices`,{PageRecordNum:data.PageRecordNum,RecordStartNo:data.RecordStartNo,value:data.value});
+}

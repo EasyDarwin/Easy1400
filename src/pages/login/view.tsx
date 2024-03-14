@@ -2,9 +2,9 @@ import { WELCOME_MESSAGE } from '@/constants/index';
 import { ErrorHandle, getToken, setToken } from '@/services/http/http';
 import { GetCaptcha, Login, getCaptcha } from '@/services/http/login';
 import { Button, Form, Input, notification } from 'antd';
-
 import { history, useMutation, useQuery } from '@umijs/max';
 import './view.less';
+import { getConfig } from '@/services/store/local';
 
 interface ILoginParams {
   username: string;
@@ -77,7 +77,7 @@ export default function Page() {
       <div className=" xl:w-[500px] xl:h-[600px] h-[550px] w-[350px] rounded-2xl absolute top-1/2 left-1/2  -translate-x-1/2 -translate-y-1/2 bg-white flex flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm ">
           <h2 className=" mt-8 text-center text-2xl font-bold tracking-wider leading-9 text-gray-900">
-            GA/T1400视图库管理系统
+            {getConfig('title') || `GA/T1400视图库管理系统`}
           </h2>
         </div>
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">

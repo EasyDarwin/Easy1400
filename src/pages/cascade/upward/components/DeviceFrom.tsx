@@ -1,6 +1,7 @@
 import { EditSelectDevice, getCascades } from '@/services/http/cascade';
 import { FindDeviceLists, getDeviceList } from '@/services/http/device';
 import { ErrorHandle } from '@/services/http/http';
+import { getConfig } from '@/services/store/local';
 import { useMutation, useQuery, useQueryClient } from '@umijs/max';
 import { Form, Input, Modal, Transfer, Typography, message } from 'antd';
 import { TransferDirection } from 'antd/es/transfer';
@@ -47,7 +48,7 @@ const CascadeFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
           const newMockData = [];
           for (let i = 0; i < res.data.APEListObject.APEObject.length; i++) {
             const data = {
-              key: i.toString(),
+              key: res.data.APEListObject.APEObject[i].ApeID,
               title: res.data.APEListObject.APEObject[i].Name,
               description: res.data.APEListObject.APEObject[i].ApeID,
             };
@@ -76,7 +77,7 @@ const CascadeFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
     direction: TransferDirection,
     moveKeys: string[],
   ) => {
-    // console.log(newTargetKeys, direction, moveKeys);
+    console.log(newTargetKeys, direction, moveKeys);
     setTargetKeys(newTargetKeys);
   };
 
@@ -87,6 +88,7 @@ const CascadeFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
 
   //关闭表单
   const handleClose = () => {
+    setTargetKeys([])
     form.resetFields();
     setModalVisible(false);
   };
@@ -115,7 +117,7 @@ const CascadeFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
             dataSource={mockData}
             targetKeys={targetKeys}
             showSearch
-            titles={['共享设备', '限制设备']}
+            titles={[getConfig('cacadeShareDevicesTableTitle1'),getConfig('cacadeShareDevicesTableTitle2')] || ['共享设备', '限制设备']}
             onSearch={handleSearch}
             listStyle={{
               width: 500,
@@ -126,7 +128,7 @@ const CascadeFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
             pagination
           />
         </Form.Item>
-        <Typography.Text type="secondary">默认共享所有设备</Typography.Text>
+        <Typography.Text type="secondary">{getConfig('cacadeShareDevicesText') || `默认不共享所有设备`}</Typography.Text>
         <Form.Item label="ID" name="id" hidden>
           <Input placeholder="上级视图库ID" />
         </Form.Item>

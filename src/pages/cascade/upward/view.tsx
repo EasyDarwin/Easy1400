@@ -203,7 +203,7 @@ const View: React.FC = () => {
       <Box>
         <Table
           loading={cascadeLoading}
-          rowKey={'ApeID'}
+          rowKey={'id'}
           key={'system_app_table_key'}
           columns={columns}
           scroll={{ x: 1300 }}

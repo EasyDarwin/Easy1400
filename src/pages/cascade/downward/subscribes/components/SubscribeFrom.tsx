@@ -242,7 +242,7 @@ const SubscribeFrom: React.FC<{ dictTypeList: Dict.DataItem[]; ref: any }> =
                   </Form.Item>
                   <Form.Item
                     label="撤销人"
-                    name="SubscribeCancelPerson "
+                    name="SubscribeCancelPerson"
                     rules={[{ required: true }]}
                   >
                     <Input placeholder="撤销人" />

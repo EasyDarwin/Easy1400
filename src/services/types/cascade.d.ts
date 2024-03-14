@@ -2,6 +2,9 @@ declare namespace Cascade {
   type ListReq = {
     size?: number;
     page?: number;
+    name?:string;
+    status?:string;
+    value?:string;
   };
 
   type Pager = {
@@ -321,5 +324,13 @@ declare namespace Cascade {
     id:string;
     Path:string;
     SubscribeID:string;
+  }
+
+  type DownwardDeviceCheckReq = {
+    value?: string;
+    MaxNumRecordReturn?: number;
+    PageRecordNum?: number;
+    RecordStartNo?: number;
+    id:string;
   }
 }

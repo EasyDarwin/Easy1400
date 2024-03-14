@@ -3,9 +3,11 @@ import React from 'react';
 const Box: React.FC<{
   children: React.ReactNode;
   style?: React.CSSProperties;
-}> = ({ children, style }) => {
+  className?: string;
+}> = ({ children, style, className }) => {
   return (
     <div
+      className={className}
       style={{
         backgroundColor: 'white',
         padding: '10px',
