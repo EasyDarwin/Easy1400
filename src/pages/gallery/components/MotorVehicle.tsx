@@ -7,7 +7,7 @@ import {
   findMotorVehicles,
 } from '@/services/http/gallery';
 import { ErrorHandle } from '@/services/http/http';
-import { DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined, TagsOutlined } from '@ant-design/icons';
 import { useMutation, useQuery, useQueryClient } from '@umijs/max';
 import {
   Affix,
@@ -44,13 +44,14 @@ const MotorVehicle: React.FC = () => {
     {
       title: '',
       dataIndex: 'MotorVehicleID',
+      fixed: true,
       render: (text: string) => {
         return (
           openCheckbox && (
             <Checkbox
               onClick={() => onCheck(text)}
               checked={checkList.includes(text)}
-            ></Checkbox>
+            />
           )
         );
       },
@@ -58,10 +59,12 @@ const MotorVehicle: React.FC = () => {
     {
       title: 'ID',
       dataIndex: 'MotorVehicleID',
+      fixed: true,
     },
     {
       title: '车牌',
       dataIndex: 'FaceAppearTime',
+      width: 150,
       render: (_, record: Gallery.MotorVehicleObject) => (
         <span>{record.PlateNo ?? '-'}</span>
       ),
@@ -69,31 +72,43 @@ const MotorVehicle: React.FC = () => {
     {
       title: '抓拍时间',
       dataIndex: 'MarkTime',
+      width: 220,
       render: (text: string) => <span>{timeToFormatTime(text)}</span>,
     },
     {
       title: '图片',
+      width: 220,
       render: (_, record: Gallery.MotorVehicleObject) => (
-        <Space size="middle">
-          {record.SubImageList?.SubImageInfoObject.map(
-            (item: Gallery.SubImageInfoObject, index: number) => (
-              <Image
-                key={item.ImageID}
-                src={`${getImgURL(item.Data)}?h=40`}
-                preview={{
-                  src: getImgURL(item.Data),
-                }}
-              />
-            ),
-          )}
-        </Space>
+        <Image.PreviewGroup>
+          <Space size="middle">
+            {record.SubImageList?.SubImageInfoObject.map(
+              (item: Gallery.SubImageInfoObject, index: number) => (
+                <Image
+                  key={item.ImageID}
+                  src={`${getImgURL(item.Data)}?h=40`}
+                  preview={{
+                    src: getImgURL(item.Data),
+                  }}
+                />
+              ),
+            )}
+          </Space>
+        </Image.PreviewGroup>
       ),
     },
     {
       title: '操作',
       fixed: 'right',
+      width: 150,
       render: (_, record: Gallery.MotorVehicleObject) => (
         <Space size="middle">
+          <Tooltip title="查看详情">
+            <Button
+              type="dashed"
+              icon={<TagsOutlined />}
+              onClick={() => onDetail(record)}
+            />
+          </Tooltip>
           <Tooltip title="删除图片">
             <Popconfirm
               title={<p>确定删除图片吗?</p>}
@@ -191,7 +206,7 @@ const MotorVehicle: React.FC = () => {
   const { mutate: delMutates, isLoading: delLoading } = useMutation(
     DelMotorVehicles,
     {
-      onSuccess: (res) => {
+      onSuccess: () => {
         message.success('删除成功');
         setCheckList([]);
         queryClient.invalidateQueries([findMotorVehicles]);
@@ -205,13 +220,17 @@ const MotorVehicle: React.FC = () => {
     onMutate: (v: string) => {
       setLoadings([...loadings, v]);
     },
-    onSuccess: (res) => {
+    onSuccess: () => {
       message.success('删除成功');
       setCheckList([]);
       queryClient.invalidateQueries([findMotorVehicles]);
     },
     onError: ErrorHandle,
   });
+
+  const onDetail = (item: any) => {
+    sharedData.openModal('MotorVehicle', item)
+  }
 
   return (
     <div>
@@ -222,7 +241,7 @@ const MotorVehicle: React.FC = () => {
           confirm={() => {
             delMutates(checkList.join());
           }}
-          cancel={() => {}}
+          cancel={() => { }}
           onCheckAll={onCheckAll}
           onCheckReverse={onCheckReverse}
           onOpenCheckbox={onOpenCheckbox}
@@ -244,6 +263,7 @@ const MotorVehicle: React.FC = () => {
                       offset={[-46, 16]}
                       onCheck={onCheck}
                       onClickDel={delMutate}
+                      onDetail={() => onDetail(item)}
                     />
                   ),
                 )}

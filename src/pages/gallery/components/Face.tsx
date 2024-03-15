@@ -14,7 +14,6 @@ import {
   message,
 } from 'antd';
 import { useContext, useState } from 'react';
-
 import { DelFace, DelFaces, FindFace, findFace } from '@/services/http/gallery';
 import { ErrorHandle } from '@/services/http/http';
 import { useMutation, useQuery, useQueryClient } from '@umijs/max';
@@ -23,7 +22,7 @@ import { AxiosResponse } from 'axios';
 import useUpdateEffect from '@/hooks/useUpdateEffect';
 import { getImgURL } from '@/package/path/path';
 import { timeToFormatTime } from '@/package/time/time';
-import { DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined, TagsOutlined } from '@ant-design/icons';
 import { ColumnsType } from 'antd/es/table';
 import '../index.less';
 import CardBox from './CardBox';
@@ -40,13 +39,14 @@ const Face: React.FC = () => {
     {
       title: '',
       dataIndex: 'FaceID',
+      fixed: true,
       render: (text: string) => {
         return (
           openCheckbox && (
             <Checkbox
               onClick={() => onCheck(text)}
               checked={checkList.includes(text)}
-            ></Checkbox>
+            />
           )
         );
       },
@@ -54,40 +54,54 @@ const Face: React.FC = () => {
     {
       title: 'ID',
       dataIndex: 'FaceID',
+      fixed: true,
     },
     {
       title: '人脸出现时间',
       dataIndex: 'FaceAppearTime',
+      width: 220,
       render: (text: string) => <span>{timeToFormatTime(text)}</span>,
     },
     {
       title: '人脸消失时间',
       dataIndex: 'FaceDisAppearTime',
+      width: 220,
       render: (text: string) => <span>{timeToFormatTime(text)}</span>,
     },
     {
       title: '图片',
+      width: 220,
       render: (_, record: Gallery.FaceObject) => (
-        <Space size="middle">
-          {record.SubImageList?.SubImageInfoObject.map(
-            (item: Gallery.SubImageInfoObject, index: number) => (
-              <Image
-                key={item.ImageID}
-                src={`${getImgURL(item.Data)}?h=40`}
-                preview={{
-                  src: getImgURL(item.Data),
-                }}
-              />
-            ),
-          )}
-        </Space>
+        <Image.PreviewGroup>
+          <Space size="middle">
+            {record.SubImageList?.SubImageInfoObject.map(
+              (item: Gallery.SubImageInfoObject, index: number) => (
+                <Image
+                  key={item.ImageID}
+                  src={`${getImgURL(item.Data)}?h=40`}
+                  preview={{
+                    src: getImgURL(item.Data),
+                  }}
+                />
+              ),
+            )}
+          </Space>
+        </Image.PreviewGroup>
       ),
     },
     {
       title: '操作',
       fixed: 'right',
+      width: 150,
       render: (text, record: Gallery.FaceObject) => (
         <Space size="middle">
+          <Tooltip title="查看详情">
+            <Button
+              type="dashed"
+              icon={<TagsOutlined />}
+              onClick={() => onDetail(record)}
+            />
+          </Tooltip>
           <Tooltip title="删除图片">
             <Popconfirm
               title={<p>确定删除图片吗?</p>}
@@ -197,6 +211,11 @@ const Face: React.FC = () => {
     },
     onError: ErrorHandle,
   });
+
+  const onDetail = (item: any) => {
+    sharedData.openModal('Face', item)
+  }
+
   return (
     <div>
       <Affix offsetTop={0}>
@@ -227,6 +246,7 @@ const Face: React.FC = () => {
                       infoLableKey={['FaceID', 'FaceAppearTime']}
                       onCheck={onCheck}
                       onClickDel={delMutate}
+                      onDetail={() => onDetail(item)}
                     />
                   ),
                 )}

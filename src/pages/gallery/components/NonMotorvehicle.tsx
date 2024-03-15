@@ -14,7 +14,7 @@ import SelectControl from './SelectControl';
 import SharedDataContext from './SharedDataContext';
 import { ColumnsType } from 'antd/es/table';
 import { getImgURL } from '@/package/path/path';
-import { DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined, TagsOutlined } from '@ant-design/icons';
 import { timeToFormatTime } from '@/package/time/time';
 import useUpdateEffect from '@/hooks/useUpdateEffect';
 
@@ -26,49 +26,61 @@ const MotorVehicle: React.FC = () => {
     {
       title: '',
       dataIndex: 'NonMotorVehicleID',
+      fixed: true,
       render: (text: string) => {
         return (
-          openCheckbox && (
-            <Checkbox
-              onClick={() => onCheck(text)}
-              checked={checkList.includes(text)}
-            ></Checkbox>
-          )
+          openCheckbox && <Checkbox
+            onClick={() => onCheck(text)}
+            checked={checkList.includes(text)}
+          />
         );
       },
     },
     {
       title: 'ID',
       dataIndex: 'NonMotorVehicleID',
+      fixed: true,
     },
     {
       title: '抓拍出现时间',
       dataIndex: 'MarkTime',
-      render: (text: string) => (<span>{timeToFormatTime(text)}</span>)
+      render: (text: string) => (<span>{timeToFormatTime(text)}</span>),
+      width: 220
     },
     {
       title: '图片',
+      width: 220,
       render: (_, record: Gallery.NonMotorVehicleObject) => (
-        <Space size="middle">
-          {record.SubImageList?.SubImageInfoObject.map(
-            (item: Gallery.SubImageInfoObject) => (
-              <Image
-                key={item.ImageID}
-                src={`${getImgURL(item.Data)}?h=40`}
-                preview={{
-                  src: getImgURL(item.Data),
-                }}
-              />
-            ),
-          )}
-        </Space>
+        <Image.PreviewGroup>
+          <Space size="middle">
+            {record.SubImageList?.SubImageInfoObject.map(
+              (item: Gallery.SubImageInfoObject) => (
+                <Image
+                  key={item.ImageID}
+                  src={`${getImgURL(item.Data)}?h=40`}
+                  preview={{
+                    src: getImgURL(item.Data),
+                  }}
+                />
+              ),
+            )}
+          </Space>
+        </Image.PreviewGroup>
       ),
     },
     {
       title: '操作',
       fixed: 'right',
+      width: 150,
       render: (_, record: Gallery.NonMotorVehicleObject) => (
         <Space size="middle">
+          <Tooltip title="查看详情">
+            <Button
+              type="dashed"
+              icon={<TagsOutlined />}
+              onClick={() => onDetail(record)}
+            />
+          </Tooltip>
           <Tooltip title="删除图片">
             <Popconfirm
               title={<p>确定删除图片吗?</p>}
@@ -165,7 +177,7 @@ const MotorVehicle: React.FC = () => {
   const { mutate: delMutates, isLoading: delLoading } = useMutation(
     DelNonMotorVehicles,
     {
-      onSuccess: (res) => {
+      onSuccess: () => {
         message.success('删除成功');
         setCheckList([]);
         queryClient.invalidateQueries([findNonMotorVehicles]);
@@ -184,6 +196,10 @@ const MotorVehicle: React.FC = () => {
     },
     onError: ErrorHandle,
   });
+
+  const onDetail = (item: any) => {
+    sharedData.openModal('NonMotorvehicle', item)
+  }
 
   return (
     <div>
@@ -215,6 +231,7 @@ const MotorVehicle: React.FC = () => {
                       data={item}
                       onCheck={onCheck}
                       onClickDel={delMutate}
+                      onDetail={() => onDetail(item)}
                     />
                   ),
                 )}

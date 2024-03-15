@@ -22,6 +22,7 @@ interface ICardBoxProps {
   checkList?: string[];
   offset?: [number | string, number | string];
   onClickImage?: () => void;
+  onDetail: (id: string) => void;
   onClickDel: (id: string) => void;
   onCheck: (id: string) => void;
 }
@@ -33,6 +34,7 @@ const CardBox: React.FC<ICardBoxProps> = ({
   checkList,
   offset = [-32, 16],
   onClickImage,
+  onDetail,
   onClickDel,
   onCheck,
 }) => {
@@ -52,7 +54,7 @@ const CardBox: React.FC<ICardBoxProps> = ({
     return label;
   };
 
-  //开启多选 点击整个box都是选中
+  // 开启多选 点击整个box都是选中
   const onCheckbox = () => {
     if (showCheck) {
       onCheck(data[infoLableKey[0]]);
@@ -66,7 +68,7 @@ const CardBox: React.FC<ICardBoxProps> = ({
           className="absolute left-2 top-1 z-10"
           onChange={() => onCheck(data[infoLableKey[0]])}
           checked={checkList?.includes(data[infoLableKey[0]])}
-        ></Checkbox>
+        />
       )}
 
       <div className="absolute bottom-0 right-0 z-10">
@@ -95,7 +97,6 @@ const CardBox: React.FC<ICardBoxProps> = ({
         <Card
           className="w-52"
           hoverable
-          // onClick={onClickImage}
           cover={
             <div className="relative">
               <img
@@ -137,59 +138,61 @@ const CardBox: React.FC<ICardBoxProps> = ({
             padding: '4px 0',
           }}
         >
-          <div className="flex items-center">
-            {data.SubImageList?.SubImageInfoObject &&
-              data.SubImageList?.SubImageInfoObject.map(
-                (item: Gallery.SubImageInfoObject, index: number) => {
-                  imageList.current.push(getImgURL(item.Data));
-                  return (
-                    <img
-                      key={item.ImageID}
-                      height="50px"
-                      onError={(e: any) => {
-                        e.target.src = './noImg.png';
-                      }}
-                      onMouseEnter={() => {
-                        setConver({
-                          ...cover,
-                          url: item.Data,
-                          typeId: item.Type,
-                          time: item.ShotTime,
-                          index: index,
-                        });
-                      }}
-                      style={{
-                        marginRight: '10px',
-                        maxWidth:
-                          data.SubImageList?.SubImageInfoObject.length >= 3
-                            ? '60px'
-                            : '90px',
-                        border:
-                          cover.url == item.Data ? 'none' : '2px solid white',
-                        backgroundColor:
-                          cover.url == item.Data ? '#BDBDBD' : 'white',
-                        padding: '3px',
-                      }}
-                      loading="lazy"
-                      src={`${getImgURL(item.Data)}?h=40`}
-                    />
-                  );
-                },
-              )}
-          </div>
+          <div onClick={() => onDetail(data)} title='查看详情' className='cursor-pointer'>
+            <div className="flex items-center">
+              {data.SubImageList?.SubImageInfoObject &&
+                data.SubImageList?.SubImageInfoObject.map(
+                  (item: Gallery.SubImageInfoObject, index: number) => {
+                    imageList.current.push(getImgURL(item.Data));
+                    return (
+                      <img
+                        key={item.ImageID}
+                        height="50px"
+                        onError={(e: any) => {
+                          e.target.src = './noImg.png';
+                        }}
+                        onMouseEnter={() => {
+                          setConver({
+                            ...cover,
+                            url: item.Data,
+                            typeId: item.Type,
+                            time: item.ShotTime,
+                            index: index,
+                          });
+                        }}
+                        style={{
+                          marginRight: '10px',
+                          maxWidth:
+                            data.SubImageList?.SubImageInfoObject.length >= 3
+                              ? '60px'
+                              : '90px',
+                          border:
+                            cover.url == item.Data ? 'none' : '2px solid white',
+                          backgroundColor:
+                            cover.url == item.Data ? '#BDBDBD' : 'white',
+                          padding: '3px',
+                        }}
+                        loading="lazy"
+                        src={`${getImgURL(item.Data)}?h=40`}
+                      />
+                    );
+                  },
+                )}
+            </div>
 
-          <div>
-            <Tooltip title="抓拍时间">
-              <span className="px-1 text-md w-full truncate ">
-                {timeToFormatTime(cover.time)}
-              </span>
-            </Tooltip>
-          </div>
+            <div>
+              <Tooltip title="抓拍时间">
+                <span className="px-1 text-md w-full truncate ">
+                  {timeToFormatTime(cover.time)}
+                </span>
+              </Tooltip>
+            </div>
 
-          <div className="text-slate-400 px-1">
-            <Tooltip title={data[infoLableKey[0]]}>
-              {shortenString(data[infoLableKey[0]], 20, 4, 14)}
-            </Tooltip>
+            <div className="text-slate-400 px-1">
+              <Tooltip title={data[infoLableKey[0]]}>
+                {shortenString(data[infoLableKey[0]], 20, 4, 14)}
+              </Tooltip>
+            </div>
           </div>
         </Card>
       </Badge>

@@ -7,7 +7,7 @@ import {
   findPersons,
 } from '@/services/http/gallery';
 import { ErrorHandle } from '@/services/http/http';
-import { DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined, TagsOutlined } from '@ant-design/icons';
 import { useMutation, useQuery, useQueryClient } from '@umijs/max';
 import {
   Affix,
@@ -40,13 +40,14 @@ const Person: React.FC = () => {
     {
       title: '',
       dataIndex: 'PersonID',
+      fixed: true,
       render: (text: string) => {
         return (
           openCheckbox && (
             <Checkbox
               onClick={() => onCheck(text)}
               checked={checkList.includes(text)}
-            ></Checkbox>
+            />
           )
         );
       },
@@ -54,40 +55,54 @@ const Person: React.FC = () => {
     {
       title: 'ID',
       dataIndex: 'PersonID',
+      fixed: true,
     },
     {
       title: '人员出现时间',
       dataIndex: 'PersonAppearTime',
+      width: 220,
       render: (text: string) => <span>{timeToFormatTime(text)}</span>,
     },
     {
       title: '人员消失时间',
       dataIndex: 'PersonDisAppearTime',
+      width: 220,
       render: (text: string) => <span>{timeToFormatTime(text)}</span>,
     },
     {
       title: '图片',
+      width: 220,
       render: (_, record: Gallery.PersonObject) => (
-        <Space size="middle">
-          {record.SubImageList?.SubImageInfoObject.map(
-            (item: Gallery.SubImageInfoObject) => (
-              <Image
-                key={item.ImageID}
-                src={`${getImgURL(item.Data)}?h=40`}
-                preview={{
-                  src: getImgURL(item.Data),
-                }}
-              />
-            ),
-          )}
-        </Space>
+        <Image.PreviewGroup>
+          <Space size="middle">
+            {record.SubImageList?.SubImageInfoObject.map(
+              (item: Gallery.SubImageInfoObject) => (
+                <Image
+                  key={item.ImageID}
+                  src={`${getImgURL(item.Data)}?h=40`}
+                  preview={{
+                    src: getImgURL(item.Data),
+                  }}
+                />
+              ),
+            )}
+          </Space>
+        </Image.PreviewGroup>
       ),
     },
     {
       title: '操作',
       fixed: 'right',
+      width: 150,
       render: (_, record: Gallery.PersonObject) => (
         <Space size="middle">
+        <Tooltip title="查看详情">
+          <Button
+            type="dashed"
+            icon={<TagsOutlined />}
+            onClick={() => onDetail(record)}
+          />
+        </Tooltip>
           <Tooltip title="删除图片">
             <Popconfirm
               title={<p>确定删除图片吗?</p>}
@@ -200,7 +215,11 @@ const Person: React.FC = () => {
       queryClient.invalidateQueries([findPersons]);
     },
     onError: ErrorHandle,
-  });
+  })
+
+  const onDetail = (item: any) => {
+    sharedData.openModal('Person', item)
+  }
   return (
     <div>
       <Affix offsetTop={0}>
@@ -232,6 +251,7 @@ const Person: React.FC = () => {
                       infoLableKey={['PersonID', 'PersonAppearTime']}
                       onCheck={onCheck}
                       onClickDel={delMutate}
+                      onDetail={() => onDetail(item)}
                     />
                   ),
                 )}

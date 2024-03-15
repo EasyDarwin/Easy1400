@@ -31,13 +31,14 @@ import MotorVehicle from './components/MotorVehicle';
 import NonMotorVehicle from './components/NonMotorvehicle';
 import Person from './components/Person';
 import SharedDataContext from './components/SharedDataContext';
+import InfoModal, { IInfoModalRef } from './components/InfoModal';
 
 const View: React.FC = () => {
   const [searchParams, _] = useSearchParams();
   const deviceID = searchParams.get('device_id') ?? '';
   const queryClient = useQueryClient();
-
   const [currentPageKey, setCurrentPageKey] = useState('face');
+  const InfoModalRef = useRef<IInfoModalRef>();
 
   const barBtnList: ButtonList[] = [
     {
@@ -200,6 +201,10 @@ const View: React.FC = () => {
     },
   );
 
+  const openModal = (key: string, info: any) => {
+    InfoModalRef.current?.init(key, info)
+  }
+
   return (
     <PageContainer title={process.env.PAGE_TITLE}>
       <Box>
@@ -225,6 +230,7 @@ const View: React.FC = () => {
             galleryDictTypes: galleryDictTypes.current || {},
             viewType,
             searchTimeValue,
+            openModal
           }}
         >
           {currentPageKey == findFace && <Face />}
@@ -234,6 +240,7 @@ const View: React.FC = () => {
         </SharedDataContext.Provider>
       </Box>
       <ToolBox data={toolBtnList} />
+      <InfoModal ref={InfoModalRef} />
     </PageContainer>
   );
 };
