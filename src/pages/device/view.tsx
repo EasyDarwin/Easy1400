@@ -145,7 +145,7 @@ const View: React.FC = () => {
       title: '每天限制总数',
       dataIndex: 'MaxCount',
       align: 'center',
-      width: 110,
+      width: 120,
       render: (text: string) => <span className={text == '0' ? 'text-red-500' : ''}>{text == '-1' ? '-' : text}</span>,
     },
     {

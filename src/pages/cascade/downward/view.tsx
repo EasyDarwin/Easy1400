@@ -3,24 +3,34 @@ import React, { useRef, useState } from 'react';
 
 import {
   ApartmentOutlined,
-  BellOutlined,
   DeleteOutlined,
+  FileTextOutlined,
   FormOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
-import { Button, Popconfirm, Space, Table, Tag, Tooltip, message } from 'antd';
+import {
+  Button,
+  Popconfirm,
+  Select,
+  Space,
+  Table,
+  Tag,
+  Tooltip,
+  message,
+} from 'antd';
+import Search from 'antd/es/input/Search';
 import { ColumnsType } from 'antd/es/table';
 
 import FunctionBar, { ButtonList } from '@/components/bar/FunctionBar';
 import Box from '@/components/box/Box';
-import { shortenString } from '@/package/string/string';
 import {
   DelDownwardCascade,
   FindDownwardCascade,
   findDownwardCascade,
 } from '@/services/http/cascade';
 import { ErrorHandle } from '@/services/http/http';
+import { getConfig } from '@/services/store/local';
 import { AxiosResponse } from 'axios';
 import DownCascadeFrom, { IDownCascadeRef } from './components/DownCascadeFrom';
 
@@ -30,13 +40,13 @@ const View: React.FC = () => {
       title: 'ID',
       dataIndex: 'id',
       align: 'center',
-      width:220
+      width: 220,
     },
     {
       title: '名称',
       dataIndex: 'name',
       align: 'center',
-      width:200,
+      width: 200,
       render: (text: string) => <span>{text ? text : '-'}</span>,
     },
     {
@@ -53,9 +63,7 @@ const View: React.FC = () => {
       dataIndex: 'remote_ip',
       align: 'center',
       width: 200,
-      render: (text: string) => (
-        <span>{text != '' ? text : '-'}</span>
-      ),
+      render: (text: string) => <span>{text != '' ? text : '-'}</span>,
     },
     {
       title: '端口',
@@ -68,14 +76,14 @@ const View: React.FC = () => {
       title: '心跳时间',
       dataIndex: 'heartbeat_at',
       align: 'center',
-      width:200,
+      width: 200,
       render: (text: string) => <span>{text ? text : '-'}</span>,
     },
     {
       title: '注册时间',
       dataIndex: 'register_at',
       align: 'center',
-      width:200,
+      width: 200,
       render: (text: string) => <span>{text ? text : '-'}</span>,
     },
     {
@@ -90,15 +98,15 @@ const View: React.FC = () => {
               <Button
                 onClick={() => {
                   let data: Cascade.DownReq = {
-                    platform_id:record.id,
-                    name:record.name ?? '',
-                    user_name:record.user_name,
-                    password:record.password,
-                    realm:record.realm,
-                    remote_port:record.remote_port,
-                    description:record.description,
-                  }
-                  downCascadeRef.current?.setFieldsValue(data,true);
+                    platform_id: record.id,
+                    name: record.name ?? '',
+                    user_name: record.user_name,
+                    password: record.password,
+                    realm: record.realm,
+                    remote_port: record.remote_port,
+                    description: record.description,
+                  };
+                  downCascadeRef.current?.setFieldsValue(data, true);
                 }}
                 icon={<FormOutlined />}
               />
@@ -113,16 +121,16 @@ const View: React.FC = () => {
                 icon={<ApartmentOutlined />}
               />
             </Tooltip>
-            {/* <Tooltip title="下级的布控">
-              <Button
-                onClick={() => {
-                  history.push(
-                    `/downward/cascade/dispositions?device_id=${record.id}`,
-                  );
-                }}
-                icon={<AppstoreOutlined />}
-              />
-            </Tooltip> */}
+            {getConfig('isChecklist') && (
+              <Tooltip title="设备清单">
+                <Button
+                  onClick={() => {
+                    history.push(`/downward/cascade/checklist/${record.id}`);
+                  }}
+                  icon={<FileTextOutlined />}
+                />
+              </Tooltip>
+            )}
             <Tooltip title="删除">
               <Popconfirm
                 title={
@@ -181,9 +189,12 @@ const View: React.FC = () => {
     },
   });
 
+  /** 查询数据 */
   const [pagination, setPagination] = useState<Cascade.ListReq>({
     page: 1,
     size: 10,
+    value: '',
+    status: '',
   });
 
   const {
@@ -202,10 +213,45 @@ const View: React.FC = () => {
     },
   );
 
+  const funcSearchComponet = (
+    <>
+      <span>
+        <span className="px-3 text-base">状态:</span>
+        <Select
+          className="mr-3"
+          defaultValue={''}
+          style={{ width: 120 }}
+          placeholder="设备状态"
+          onChange={(value: string) => {
+            setPagination({ ...pagination, status: value });
+          }}
+          options={[
+            { value: '', label: '全部' },
+            { value: 'online', label: '在线' },
+            { value: 'offline', label: '离线' },
+          ]}
+        />
+      </span>
+
+      <Search
+        className="w-96"
+        enterButton
+        placeholder="请输入id 或 名称"
+        onSearch={(value: string) => {
+          setPagination({ ...pagination, value: value });
+        }}
+      />
+    </>
+  );
+
   return (
     <PageContainer title={process.env.PAGE_TITLE}>
       <Box>
-        <FunctionBar btnChannle={funcBtnList} />
+        <FunctionBar
+          btnChannle={funcBtnList}
+          rigthChannle={funcSearchComponet}
+          rigthChannleClass="flex justify-end"
+        />
       </Box>
       <Box>
         <Table

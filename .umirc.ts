@@ -49,6 +49,12 @@ export default defineConfig({
       component: 'cascade/downward/view',
     },
     {
+      name: '设备清单',
+      path: '/downward/cascade/checklist/:device_id',
+      component: 'cascade/downward/checklist/view',
+      hideInMenu: true,
+    },
+    {
       name: '订阅内容',
       path: '/downward/cascade/subscribes',
       component: 'cascade/downward/subscribes/view',
@@ -102,7 +108,7 @@ export default defineConfig({
         {
           name: '关于我们',
           path: '/system/about',
-          component: 'system/about/view',
+          component:'system/about/view',
         },
       ],
     },
@@ -126,7 +132,7 @@ export default defineConfig({
   publicPath: '/admin/',
   history: { type: 'hash' },
   layout: {
-    title: '1400视图库管理系统',
+    title: '',
   },
   define: {
     'process.env': {

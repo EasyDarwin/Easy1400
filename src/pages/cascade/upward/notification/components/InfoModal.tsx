@@ -91,6 +91,7 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
   const getDataList = () => {
     switch (mapKey.current) {
       case 'DeviceList':
+        //TODO 这里如果是设备就没有做任何处理 需要修改 采集设备列表
         return;
       case 'FaceObjectList':
         saveData('/VIID/Faces');

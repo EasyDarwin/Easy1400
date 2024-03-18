@@ -94,6 +94,7 @@ export function cleanStoreage() {
   sessionStorage.removeItem(userID);
   sessionStorage.removeItem(username);
 }
+
 export function setToken(token: string, id: number, name: string) {
   sessionStorage.setItem(tokenStr, token);
   sessionStorage.setItem(userID, id.toString());
