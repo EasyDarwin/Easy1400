@@ -5,6 +5,7 @@ import {
   ApartmentOutlined,
   ApiOutlined,
   BellOutlined,
+  CloudUploadOutlined,
   DeleteOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
@@ -94,15 +95,23 @@ const View: React.FC = () => {
                 icon={<ApartmentOutlined />}
               />
             </Tooltip>
-            <Tooltip title="通知记录">
+            <Tooltip title="上报记录">
               <Button
+                onClick={() => {
+                  history.push(
+                    `/upward/cascade/reporting?up_id=${record.id}`,
+                  );
+                }}
+                icon={<CloudUploadOutlined />}
+              />
+              {/* <Button
                 onClick={() => {
                   history.push(
                     `/upward/cascade/notification?device_id=${record.id}`,
                   );
                 }}
                 icon={<BellOutlined />}
-              />
+              /> */}
             </Tooltip>
             <Tooltip title="选择共享设备">
               <Button
@@ -178,7 +187,7 @@ const View: React.FC = () => {
 
   const [pagination, setPagination] = useState<Cascade.ListReq>({
     page: 1,
-    limit: 10,
+    size: 10,
   });
 
   const {
@@ -210,10 +219,10 @@ const View: React.FC = () => {
           dataSource={cascadeData?.items}
           pagination={{
             total: cascadeData?.total,
-            pageSize: pagination.limit,
+            pageSize: pagination.size,
             current: pagination.page,
-            onChange: (page: number, limit: number) => {
-              setPagination({ ...pagination, page, limit });
+            onChange: (page: number, size: number) => {
+              setPagination({ ...pagination, page, size });
             },
             showTotal: (total) => `共 ${total} 条`,
           }}

@@ -1,7 +1,10 @@
 import { Modal, Typography, Image, Space, Descriptions } from 'antd';
-import { forwardRef, useImperativeHandle, useState, useRef, useMemo } from 'react';
+import { forwardRef, useImperativeHandle, useState, useRef, useMemo, useEffect } from 'react';
+import { findGalleryData } from '@/services/http/gallery';
 import { getImgURL } from '@/package/path/path';
 import { timeToFormatTime } from '@/package/time/time';
+import { ErrorHandle } from '@/services/http/http';
+import { AxiosResponse } from 'axios';
 import { ColumnItems } from './ColumnItems'
 
 export interface IInfoModalRef {
@@ -12,10 +15,11 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef<IInfoModalRef>(
   ({ }, ref) => {
 
     const [visible, setVisible] = useState<boolean>(false);
-    const [data, setData] = useState<any>();
+    const [data, setData] = useState<any>({});
     const [key, setKey] = useState<string>('');
-    const [imgData, setImageData] = useState<Gallery.SubImageList>();
-    const [allData, setAllData] = useState();
+    const [imageData, setImageData] = useState<Gallery.SubImageList>({
+      SubImageInfoObject: []
+    });
 
     const currentItems = useMemo(() => key ? ColumnItems[key] : [], [key])
 
@@ -23,6 +27,28 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef<IInfoModalRef>(
       setKey('')
       setVisible(false)
     };
+
+    useEffect(() => {
+      getInfoData()
+    }, [key])
+
+    const getInfoData = () => {
+      if (!key) return
+      if (data.DeviceID) return
+
+      findGalleryData({
+        url: `/VIID/${key}s`,
+        id: data?.object_id ?? '',
+      })
+        .then((res: AxiosResponse) => {
+          const currentData = res.data?.[`${key}ListObject`]?.[`${key}Object`] || []
+          setData(currentData[0])
+          setImageData(currentData[0]?.SubImageList || {});
+        })
+        .catch((error: Error) => {
+          ErrorHandle(error);
+        });
+    }
 
     const getDescItem = (item: any) => {
       let text = data[item.code]
@@ -44,9 +70,13 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef<IInfoModalRef>(
     }
 
     useImperativeHandle(ref, () => ({
-      init: (key: string, info: any) => {        
+      init: (key: string, info: any) => {    
         setKey(key)
-        setData(info);
+        if (info.DeviceID) {
+          // 图库
+          setData(info);
+          setImageData(info?.SubImageList || [])
+        }
         setVisible(true);
       },
     }));
@@ -62,7 +92,8 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef<IInfoModalRef>(
       >
         <Image.PreviewGroup>
           <Space size="middle">
-            {data?.SubImageList?.SubImageInfoObject.map(
+            {imageData.SubImageInfoObject.map(
+            // {data?.SubImageList?.SubImageInfoObject.map(
               (item: Gallery.SubImageInfoObject) => (
                 <Image
                   key={item.ImageID}

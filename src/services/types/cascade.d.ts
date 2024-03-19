@@ -109,8 +109,18 @@ declare namespace Cascade {
     try_count: number;
     up_id: string;
   };
-
-
+  type NotificationListReq = {
+    PageRecordNum: number;
+    RecordStartNo: number;
+    up_id?: string;
+    // device_id: string;
+    // device_name: string;
+    info_ids: string;
+    value: string;
+    timeRange?: Array;
+    start_at?: integer;
+    end_at?: integer;
+  }
 
   /** ########## 向下级联 ##########  */
   type DownListRes = {

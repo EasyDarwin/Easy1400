@@ -198,7 +198,7 @@ const MotorVehicle: React.FC = () => {
   });
 
   const onDetail = (item: any) => {
-    sharedData.openModal('NonMotorvehicle', item)
+    sharedData.openModal('NonMotorVehicle', item)
   }
 
   return (
@@ -248,6 +248,7 @@ const MotorVehicle: React.FC = () => {
           <div className="h-full ">
             <Table
               key={'nomotorTabel'}
+              rowKey="SourceID"
               pagination={{
                 position: ['none'],
                 total: galleryList?.NonMotorVehicleListObject.TotalNum,

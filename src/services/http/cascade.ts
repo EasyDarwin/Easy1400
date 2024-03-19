@@ -45,7 +45,7 @@ export async function DelSubscribes(data: string) {
 
 //>>>>>> 通知  <<<<<
 export const findNotifies = 'FindNotifies';
-export async function FindNotifies(data: Cascade.DispositionsListReq) {
+export async function FindNotifies(data: Cascade.NotificationListReq) {
   return await GET<Cascade.NotifyListRes>(`/notifications`, data);
 }
 

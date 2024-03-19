@@ -44,6 +44,12 @@ export default defineConfig({
       hideInMenu: true,
     },
     {
+      name: '上报记录',
+      path: '/upward/cascade/reporting',
+      component: 'cascade/upward/reporting/view',
+      hideInMenu: true,
+    },
+    {
       name: '下级平台',
       path: '/downward/cascade',
       component: 'cascade/downward/view',

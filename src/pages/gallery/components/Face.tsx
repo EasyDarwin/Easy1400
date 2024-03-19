@@ -263,6 +263,7 @@ const Face: React.FC = () => {
           <div className="h-full">
             <Table
               key={'faceTabel'}
+              rowKey="SourceID"
               pagination={{
                 position: ['none'],
                 total: galleryList?.FaceListObject.TotalNum,

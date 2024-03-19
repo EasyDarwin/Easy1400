@@ -163,7 +163,7 @@ export const ColumnItems: any = {
     { label: '品牌标志识别可信度', code: 'BrandReliability' },    
   ],
   // 非机动车
-  'NonMotorvehicle': [
+  'NonMotorVehicle': [
     { label: '车辆标识', code: 'NonMotorVehicleID' },
     { label: '信息分类', code: 'InfoType' },
     { label: '来源标识', code: 'SourceID' },

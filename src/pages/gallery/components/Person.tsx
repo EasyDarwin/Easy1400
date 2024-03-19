@@ -268,6 +268,7 @@ const Person: React.FC = () => {
           <div className="h-full ">
             <Table
               key={'personTabel'}
+              rowKey="SourceID"
               pagination={{
                 position: ['none'],
                 total: galleryList?.PersonListObject.TotalNum,
