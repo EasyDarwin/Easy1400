@@ -11,7 +11,7 @@ import {
   findDownwardNotification,
 } from '@/services/http/cascade';
 import { ErrorHandle } from '@/services/http/http';
-import { DeleteOutlined, TagsOutlined } from '@ant-design/icons';
+import { DeleteOutlined, TagsOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { history, useMutation, useSearchParams } from '@umijs/max';
 import { AxiosResponse } from 'axios';
 import InfoModal, { InfoModalRef } from './components/InfoModal';
@@ -135,6 +135,7 @@ const Notification: React.FC = () => {
             history.back();
           }}
         >
+          <ArrowLeftOutlined />
           返回
         </Button>
       </Box>

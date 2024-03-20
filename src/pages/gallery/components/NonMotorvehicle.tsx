@@ -102,7 +102,7 @@ const MotorVehicle: React.FC = () => {
   ];
 
   const [pagination, setPagination] = useState<Gallery.Pager>({
-    PageRecordNum: 100,
+    PageRecordNum: 30,
     RecordStartNo: 1,
     DeviceID: sharedData.deviceID || '',
     start_at: sharedData.searchTimeValue?.start,
@@ -277,7 +277,7 @@ const MotorVehicle: React.FC = () => {
               });
             }}
             showTotal={(total) => `共 ${total} 条`}
-            pageSizeOptions={[10, 50, 100]}
+            pageSizeOptions={[10, 30, 50, 100]}
           />
         </div>
       </Spin>

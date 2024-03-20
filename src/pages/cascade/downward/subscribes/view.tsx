@@ -1,10 +1,10 @@
 import React, { useRef, useState } from 'react';
-
 import {
   BellOutlined,
   DeleteOutlined,
   FormOutlined,
   PlusOutlined,
+  ArrowLeftOutlined,
 } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { history, useMutation, useQuery, useSearchParams } from '@umijs/max';
@@ -38,7 +38,8 @@ const SubScribes: React.FC = () => {
       title: '订阅标识符',
       dataIndex: 'EXT.SubscribeID',
       align: 'center',
-      width: 300,
+      fixed: true,
+      width: 200,
       render: (_: string, record: Cascade.DownSubscribesListItem) => (
         <span>{record.id}</span>
       ),
@@ -47,6 +48,7 @@ const SubScribes: React.FC = () => {
       title: '订阅标题',
       dataIndex: 'Ext.Title',
       align: 'center',
+      width: 200,
       render: (_: string, record: Cascade.DownSubscribesListItem) => (
         <span>{record.Ext?.Title ?? ''}</span>
       ),
@@ -54,19 +56,20 @@ const SubScribes: React.FC = () => {
     {
       title: '订阅类别',
       align: 'center',
-      render: (_: string, record: Cascade.DownSubscribesListItem) => {
-        return record.Ext?.SubscribeDetail?.split(',').map((item) => (
-          <Tag className="my-1" color="processing" key={item}>
+      width: 380,
+      render: (_: string, record: Cascade.DownSubscribesListItem) => (
+        record.Ext?.SubscribeDetail?.split(',').map((item, i) => (
+          <Tag className="my-1" color="processing" key={i}>
             {findDictLabel(dictTypeList ?? [], item)}
           </Tag>
-        ));
-      },
+        ))
+      ),
     },
     {
       title: '订阅状态',
       dataIndex: 'OperateType',
       align: 'center',
-      width: 100,
+      width: 120,
       render: (_: number,record: Cascade.DownSubscribesListItem) => (
         <Tag>{record.Ext?.OperateType == 0 ? '订阅中' : '订阅已取消'}</Tag>
       ),
@@ -75,6 +78,7 @@ const SubScribes: React.FC = () => {
       title: '间隔时间(秒)',
       dataIndex: 'Ext.ReportInterval',
       align: 'center',
+      width: 120,
       render: (_: string, record: Cascade.DownSubscribesListItem) => (
         <span>{record.Ext?.ReportInterval ?? ''}</span>
       ),
@@ -82,7 +86,7 @@ const SubScribes: React.FC = () => {
     {
       title: '时间',
       align: 'center',
-      width: 230,
+      width: 240,
       render: (_: string, record: Cascade.DownSubscribesListItem) => (
         <span>
           <div>开始时间: {timeToFormatTime(record.Ext?.BeginTime ?? '')}</div>
@@ -90,7 +94,6 @@ const SubScribes: React.FC = () => {
         </span>
       ),
     },
-
     {
       title: '操作',
       align: 'center',
@@ -146,6 +149,13 @@ const SubScribes: React.FC = () => {
   ];
 
   const funcBtnList: ButtonList[] = [
+    {
+      label: '返回',
+      icon: <ArrowLeftOutlined />,
+      onClick: () => {
+        history.back();
+      }
+    },
     //顶部按钮列表
     {
       label: '添加',
@@ -233,7 +243,7 @@ const SubScribes: React.FC = () => {
           key={'system_app_table_key'}
           columns={columns}
           dataSource={subscribesData?.items}
-          scroll={{ x: 1300 }}
+          scroll={{ x: '100%' }}
           pagination={{
             total: subscribesData?.total,
             pageSize: pagination.size,

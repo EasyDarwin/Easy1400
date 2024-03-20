@@ -39,6 +39,7 @@ const View: React.FC = () => {
     {
       title: 'ID',
       dataIndex: 'id',
+      fixed: true,
       align: 'center',
       width: 220,
     },
@@ -215,27 +216,23 @@ const View: React.FC = () => {
 
   const funcSearchComponet = (
     <>
-      <span>
-        <span className="px-3 text-base">状态:</span>
-        <Select
-          className="mr-3"
-          defaultValue={''}
-          style={{ width: 120 }}
-          placeholder="设备状态"
-          onChange={(value: string) => {
-            setPagination({ ...pagination, status: value });
-          }}
-          options={[
-            { value: '', label: '全部' },
-            { value: 'online', label: '在线' },
-            { value: 'offline', label: '离线' },
-          ]}
-        />
-      </span>
-
+      <Select
+        className="w-80 mr-3"
+        placeholder="请选择设备状态"
+        allowClear
+        onChange={(value: string) => {
+          setPagination({ ...pagination, status: value });
+        }}
+        options={[
+          // { value: '', label: '全部' },
+          { value: 'online', label: '在线' },
+          { value: 'offline', label: '离线' },
+        ]}
+      />
       <Search
-        className="w-96"
+        className="w-80"
         enterButton
+        allowClear
         placeholder="请输入id 或 名称"
         onSearch={(value: string) => {
           setPagination({ ...pagination, value: value });
@@ -256,10 +253,10 @@ const View: React.FC = () => {
       <Box>
         <Table
           loading={cascadeLoading}
-          rowKey={'ApeID'}
+          rowKey={'id'}
           key={'system_app_table_key'}
           columns={columns}
-          scroll={{ x: 1300 }}
+          scroll={{ x: '100%' }}
           dataSource={cascadeData?.items}
           pagination={{
             total: cascadeData?.total,

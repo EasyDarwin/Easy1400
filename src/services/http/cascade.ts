@@ -137,3 +137,8 @@ export async function FindDownwardNotificationJson(url:string) {
 export async function FindDownwardDeviceCheck(data:Cascade.DownwardDeviceCheckReq){
   return await GET<Device.FindReq>(`/platforms/${data.id}/devices`,{PageRecordNum:data.PageRecordNum,RecordStartNo:data.RecordStartNo,value:data.value});
 }
+
+// 同步下级设备状态给上级
+export async function FindDownwardDeviceSyncCheck(id: any) {
+  return await GET(`/platforms/${id}/sync/devices`)
+}

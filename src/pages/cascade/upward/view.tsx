@@ -215,7 +215,7 @@ const View: React.FC = () => {
           rowKey={'id'}
           key={'system_app_table_key'}
           columns={columns}
-          scroll={{ x: 1300 }}
+          scroll={{ x: '100%' }}
           dataSource={cascadeData?.items}
           pagination={{
             total: cascadeData?.total,

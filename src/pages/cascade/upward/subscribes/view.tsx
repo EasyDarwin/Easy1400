@@ -2,9 +2,9 @@ import { useQuery } from '@umijs/max';
 import React, { useState } from 'react';
 
 import { PageContainer } from '@ant-design/pro-components';
-import { Tag } from 'antd';
+import { Tag, Button } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import Table, { ColumnsType } from 'antd/es/table';
-
 import Box from '@/components/box/Box';
 import { CACHE_CLEAR_TIME } from '@/constants';
 import { findDictLabel } from '@/package/array/array';
@@ -24,33 +24,33 @@ const Subscribes: React.FC = () => {
       title: '订阅标识符',
       dataIndex: 'SubscribeID',
       align: 'center',
-      width: 230,
+      width: 200,
+      fixed: true
     },
     {
       title: '订阅标题',
       dataIndex: 'Title',
       align: 'center',
-      width: 150,
+      width: 200,
     },
-
     {
       title: '订阅类别',
       dataIndex: 'SubscribeDetail',
       align: 'center',
-      render: (text: string, record: Cascade.SubscribeObject) => {
-        return record.SubscribeDetail?.split(',').map((item) => (
-          <Tag className="my-1" color="processing" key={item}>
+      width: 380,
+      render: (_: any, record: Cascade.SubscribeObject) => (
+        record.SubscribeDetail?.split(',').map((item, i) => (
+          <Tag className="my-1" color="processing" key={i}>
             {findDictLabel(hdirectionTypeList ?? [], item)}
           </Tag>
-        ));
-      },
+        ))
+      ),
     },
-
     {
       title: '订阅状态',
       dataIndex: 'OperateType',
       align: 'center',
-      width: 100,
+      width: 120,
       render: (text: number) => (
         <Tag>{text == 0 ? '订阅中' : '订阅已取消'}</Tag>
       ),
@@ -59,12 +59,12 @@ const Subscribes: React.FC = () => {
       title: '间隔时间(秒)',
       dataIndex: 'ReportInterval',
       align: 'center',
+      width: 120,
     },
-
     {
       title: '时间',
       align: 'center',
-      width: 300,
+      width: 240,
       render: (text: string, record: Cascade.SubscribeObject) => (
         <span>
           <div>开始时间:{timeToFormatTime(record.BeginTime ?? '')}</div>
@@ -141,9 +141,15 @@ const Subscribes: React.FC = () => {
   return (
     <PageContainer title={process.env.PAGE_TITLE}>
       <Box>
+        <Button onClick={() => { history.back(); }}>
+          <ArrowLeftOutlined />
+          返回
+        </Button>
+      </Box>
+      <Box>
         <Table
           loading={subscribesLoading}
-          rowKey={'ApeID'}
+          rowKey="id"
           key={'system_app_table_key'}
           columns={columns}
           scroll={{ x: 1100 }}

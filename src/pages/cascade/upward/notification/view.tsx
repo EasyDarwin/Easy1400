@@ -76,7 +76,7 @@ const Notification: React.FC = () => {
   const infoModalRef = useRef<InfoModalRef>();
 
   const [pagination, setPagination] = useState<Cascade.DispositionsListReq>({
-    PageRecordNum: 10,
+    PageRecordNum: 30,
     RecordStartNo: 1,
     up_id: deviceID || '',
   });
@@ -105,9 +105,10 @@ const Notification: React.FC = () => {
             pageSize: pagination.PageRecordNum,
             current: pagination.RecordStartNo,
             onChange: (RecordStartNo: number, PageRecordNum: number) => {
-              setPagination({ ...pagination, RecordStartNo, PageRecordNum });
+              setPagination({ ...pagination, RecordStartNo: PageRecordNum !== pagination.PageRecordNum ? 1 : RecordStartNo , PageRecordNum });
             },
             showTotal: (total) => `共 ${total} 条`,
+            pageSizeOptions: [10, 30, 50, 100]
           }}
         />
       </Box>

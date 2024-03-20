@@ -364,7 +364,7 @@ const View: React.FC = () => {
           loading={deviceListLoading}
           rowKey={'ApeID'}
           key={'system_app_table_key'}
-          scroll={{ x: 1300 }}
+          scroll={{ x: '100%' }}
           columns={columns}
           dataSource={deviceData?.APEListObject.APEObject}
           rowSelection={{
@@ -384,7 +384,7 @@ const View: React.FC = () => {
             },
             showTotal: (total) => `共 ${total} 条`,
             showSizeChanger: true,
-            pageSizeOptions: [10, 50, 100],
+            pageSizeOptions: [10, 20, 50, 100],
           }}
         />
       </Box>

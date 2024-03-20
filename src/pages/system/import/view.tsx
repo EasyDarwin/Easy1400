@@ -72,11 +72,11 @@ const View: React.FC = () => {
     },
   ];
 
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
   const [historyQuery, setHistoryQuery] = useState<Device.FindImportHistoryReq>(
     {
       page: 1,
-      size: 10,
+      size: 30,
       type: 'ape',
     },
   );
@@ -113,7 +113,7 @@ const View: React.FC = () => {
           },
           showTotal: (total) => `共 ${total} 条`,
           showSizeChanger: true,
-          pageSizeOptions: [10, 50, 100],
+          pageSizeOptions: [10, 20, 50, 100],
         }}
       />
       <InfoModal ref={InfoModalRef} />

@@ -4,11 +4,12 @@ import React, { useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-components';
 import { Button, Space, Tooltip, Form, Input, Select, DatePicker, Row, Col } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
-
+import Search from 'antd/es/input/Search';
 import Box from '@/components/box/Box';
 import { FindNotifies, findNotifies } from '@/services/http/cascade';
+import FunctionBar, { ButtonList } from '@/components/bar/FunctionBar';
 import { ErrorHandle } from '@/services/http/http';
-import { TagsOutlined } from '@ant-design/icons';
+import { TagsOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { useSearchParams } from '@umijs/max';
 import { AxiosResponse } from 'axios';
 import InfoModal, { IInfoModalRef } from '@/pages/gallery/components/InfoModal';
@@ -37,44 +38,45 @@ const Notification: React.FC = () => {
       dataIndex: 'id',
       align: 'center',
       fixed: true,
-      width: 150,
+      width: 180,
     },
     {
       title: '设备ID',
       dataIndex: 'device_id',
       align: 'center',
-      width: 220,
+      width: 200,
     },
     {
       title: '设备名称',
       dataIndex: 'device_name',
       align: 'center',
-      width: 220,
+      width: 180,
     },
     {
       title: '图片类型',
       dataIndex: 'info_ids',
       align: 'center',
-      width: 220,
+      width: 180,
       render: (text: string) => <span>{infoTypeEnums[text] || ''}</span>
     },
     {
       title: '订阅ID',
       dataIndex: 'subscribe_id',
       align: 'center',
-      width: 220,
+      width: 180,
     },
     {
       title: '尝试次数',
       dataIndex: 'try_count',
       align: 'center',
-      width: 150,
+      width: 140,
     },
     {
       title: '通知结果',
       dataIndex: 'result',
       align: 'center',
-      width: 150,
+      width: 220,
+      ellipsis: true,
       render: (text: string) => (
         <span className={text == 'OK' ? 'text-green-500' : ''}>{text}</span>
       ),
@@ -83,7 +85,7 @@ const Notification: React.FC = () => {
       title: '通知时间',
       dataIndex: 'trigger_time',
       align: 'center',
-      width: 220,
+      width: 180,
       render: (text: string) => <span>{timeToFormatTime(text)}</span>,
     },
     {
@@ -139,57 +141,56 @@ const Notification: React.FC = () => {
       },
     );
 
-  const onReset = () => {
-    form.resetFields()
-  }
+  const barBtnList: ButtonList[] = [
+    {
+      label: '返回',
+      icon: <ArrowLeftOutlined />,
+      onClick: () => {
+        history.back();
+      }
+    }
+  ]
+
+  const funcSearchComponet = (
+    <div className="flex justify-between">
+      <RangePicker
+        showTime
+        allowClear
+        className="mr-2"
+        format="YYYY-MM-DD HH:mm:ss"
+        onChange={(value: any) => {
+          setParams({ ...params, timeRange: value });
+        }}
+      />
+      <Select 
+        placeholder="请选择图片类型" 
+        allowClear 
+        className="mr-2 w-60"
+        options={infoTypes}
+        onChange={(value: string) => {
+          setParams({ ...params, info_ids: value });
+        }}
+      />
+      <Search
+        enterButton
+        className="w-80"
+        placeholder="请输入设备ID或名称"
+        onSearch={(value: string) => {
+          setParams({ ...params, value: value });
+        }}
+      />
+    </div>
+  );
+
   return (
     <PageContainer title={process.env.PAGE_TITLE}>
-      <Box>
-        <Form
-          form={form}
-          layout="inline"
-          autoComplete="off"
-          labelCol={{ style: { width: '70px' } }}
-          onFinish={(vals: Cascade.NotificationListReq) => {
-            setParams({ ...params, ...vals, RecordStartNo: 1 })
-          }}
-        >
-          <Row gutter={24} className="w-full">
-            <Col span={8}>
-              <Form.Item label="设备ID" name="device_id">
-                <Input placeholder="请输入设备ID" className="w-full" allowClear />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item label="设备名称" name="device_name">
-                <Input placeholder="请输入设备名称" className="w-full" allowClear />
-              </Form.Item>
-            </Col>
-            {/* <Col span={7}>
-              <Form.Item label="设备" name="value">
-                <Input placeholder="请输入设备名称" className="w-full" allowClear />
-              </Form.Item>
-            </Col> */}
-            <Col span={8}>
-              <Form.Item label="图片类型" name="info_ids">
-                <Select placeholder="请选择图片类型" className="w-full" allowClear options={infoTypes} />
-              </Form.Item>
-            </Col>
-            <Col span={8} className='mt-[10px]'>
-              <Form.Item label="时间" name="timeRange">
-                <RangePicker showTime allowClear format="YYYY-MM-DD HH:mm" className="w-full" />
-              </Form.Item>
-            </Col>
-            <Col span={8} className='mt-[10px]'>
-              <Form.Item>
-                <div className="w-full inline-flex" style={{ justifyContent: 'flex-end'}}>
-                  <Button type="primary" htmlType="submit" className='mr-[8px]' loading={notificationLoading}>查询</Button>
-                  <Button type="primary" onClick={onReset}>重置</Button>
-                </div>
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form>
+      <Box className="flex justify-between items-center mt-2">
+        <FunctionBar
+          btnChannle={barBtnList}
+          span={[4, 20]}
+          rigthChannle={funcSearchComponet}
+          rigthChannleClass="flex justify-end"
+        />
       </Box>
       <Box>
         <Table
