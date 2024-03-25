@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import {
   ApartmentOutlined,
   ApiOutlined,
-  BellOutlined,
+  // BellOutlined,
   CloudUploadOutlined,
   DeleteOutlined,
   PlusOutlined,
@@ -30,19 +30,21 @@ const View: React.FC = () => {
       title: 'ID',
       dataIndex: 'id',
       align: 'center',
+      fixed: true,
       width: 230,
     },
     {
       title: '名称',
       dataIndex: 'name',
       align: 'center',
+      width: 180,
       render: (text: string) => <span>{text ? text : '-'}</span>,
     },
     {
       title: '状态',
       dataIndex: 'status',
       align: 'center',
-      width: 110,
+      width: 120,
       render: (text: string) => (
         <Tag color={text == 'OK' ? 'green' : 'red'}>
           {text == 'OK' ? '在线' : '离线'}
@@ -54,6 +56,7 @@ const View: React.FC = () => {
       title: '地址',
       dataIndex: 'ip',
       align: 'center',
+      width: 180,
       render: (text: string, record: Cascade.Item) => {
         const str = `${record.ip}:${record.port}`;
         return <span>{str ? str : '-'}</span>;
@@ -64,12 +67,14 @@ const View: React.FC = () => {
       title: '心跳时间',
       dataIndex: 'heartbeat_at',
       align: 'center',
+      width: 180,
       render: (text: string) => <span>{text ? text : '-'}</span>,
     },
     {
       title: '注册时间',
       dataIndex: 'register_at',
       align: 'center',
+      width: 180,
       render: (text: string) => <span>{text ? text : '-'}</span>,
     },
     {
@@ -117,10 +122,11 @@ const View: React.FC = () => {
               <Button
                 className={record.device_ids?.length > 0 ? 'text-yellow-500 border-dashed border-yellow-500' : ''}
                 onClick={() => {
-                  deviceRef.current?.setFieldsValue({
-                    id: record.id,
-                    device_ids: record.device_ids || [],
-                  });
+                  history.push(`/upward/cascade/device/${record.id}`)
+                  // deviceRef.current?.setFieldsValue({
+                  //   id: record.id,
+                  //   device_ids: record.device_ids || [],
+                  // });
                 }}
                 icon={<ApiOutlined />}
               />

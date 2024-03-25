@@ -50,6 +50,12 @@ export default defineConfig({
       hideInMenu: true,
     },
     {
+      name: '设备共享',
+      path: '/upward/cascade/device/:platform_id',
+      component: 'cascade/upward/device/view',
+      hideInMenu: true,
+    },
+    {
       name: '下级平台',
       path: '/downward/cascade',
       component: 'cascade/downward/view',
@@ -78,6 +84,16 @@ export default defineConfig({
       component: 'cascade/downward/notification/view',
       hideInMenu: true,
     },
+    // {
+    //   name: '虚拟组织',
+    //   path: '/virtualOrganization',
+    //   component: 'virtualOrganization/view',
+    // },
+    // {
+    //   name: '绑定设备',
+    //   path: '/virtualOrganization/:org_id/device',
+    //   component: 'virtualOrganization/device/view',
+    // },
     {
       name: '系统设置',
       path: '/system',

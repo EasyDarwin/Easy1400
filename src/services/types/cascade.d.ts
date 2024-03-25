@@ -343,4 +343,24 @@ declare namespace Cascade {
     RecordStartNo?: number;
     id:string;
   }
+
+  // 设备共享
+  type DeviceShareReq = {
+    platform: string;
+    devices: React.Key[];
+    person: boolean;
+    face: boolean;
+    motor_vehicle: boolean;
+    non_motor_vehicle: boolean;
+  }
+  type DeviceShareItem = {
+    ID: string;
+    PlatformID: string;
+    APEID: string;
+    Name: string;
+    Person: boolean;
+    Face: boolean;
+    MotorVehicle: boolean;
+    NonMotorVehicle: boolean;
+  }
 }

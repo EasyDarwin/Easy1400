@@ -1,4 +1,4 @@
-import { useQuery } from '@umijs/max';
+import { useQuery, useSearchParams } from '@umijs/max';
 import React, { useRef, useState } from 'react';
 
 import { PageContainer } from '@ant-design/pro-components';
@@ -10,7 +10,6 @@ import { FindNotifies, findNotifies } from '@/services/http/cascade';
 import FunctionBar, { ButtonList } from '@/components/bar/FunctionBar';
 import { ErrorHandle } from '@/services/http/http';
 import { TagsOutlined, ArrowLeftOutlined } from '@ant-design/icons';
-import { useSearchParams } from '@umijs/max';
 import { AxiosResponse } from 'axios';
 import InfoModal, { IInfoModalRef } from '@/pages/gallery/components/InfoModal';
 // import InfoModal, { InfoModalRef } from '../notification/components/InfoModal';

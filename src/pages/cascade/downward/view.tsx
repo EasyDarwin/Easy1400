@@ -242,7 +242,7 @@ const View: React.FC = () => {
   );
 
   return (
-    <PageContainer title={process.env.PAGE_TITLE}>
+    <PageContainer title={process.env.PAGE_TITLE} style={{ height: 'calc(100vh - 26px)'}}>
       <Box>
         <FunctionBar
           btnChannle={funcBtnList}

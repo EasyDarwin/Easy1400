@@ -26,6 +26,21 @@ export async function EditSelectDevice(data: {
   });
 }
 
+// 查询对上级的限制
+export const findCascadeShare = 'FindCascadeShare';
+export async function FindCascadeShare(id: string) {
+  return await GET(`/cascades/${id}/share`);
+}
+// 限制设备和类型
+export async function SaveCascadeShare(data: Cascade.DeviceShareReq) {
+  // const { platform, ...others } = data
+  return await POST(`/cascades/${data.platform}/share`, data);
+}
+// 删除对上级的限制
+export async function DeleteCascadeShare(ids: string) {
+  return await DELETE('/cascades/share/', { id: ids });
+}
+
 //>>>>> 布控  <<<<<
 export const findDispositions = 'FindDispositions';
 export async function FindDispositions(data: Cascade.DispositionsListReq) {

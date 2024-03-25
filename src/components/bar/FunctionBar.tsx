@@ -1,5 +1,5 @@
 import { DownloadOutlined } from '@ant-design/icons';
-import { Button, Col, Row, Upload, UploadProps } from 'antd';
+import { Button, Col, Row, Upload, Popconfirm, UploadProps } from 'antd';
 
 import React, { useState } from 'react';
 
@@ -10,6 +10,9 @@ export interface ButtonList {
   color?: string;
   type?: 'link' | 'text' | 'default' | 'primary' | 'dashed' | undefined;
   disabled?: boolean;
+  danger?: boolean;
+  isPopConfirm?: boolean;
+  popConfirmTitle?: string | React.ReactNode;
   onClick: () => void;
 }
 
@@ -47,27 +50,44 @@ const FunctionBar: React.FC<IFunctionBarPorps> = ({
 }) => {
   const [selectedID, setSelectedID] = useState(0);
 
+  const renderButton = (button:any, index: number, bindClick: boolean = false) => (
+    <Button
+      key={index}
+      loading={button.loading}
+      onClick={() => {
+        if (bindClick) {
+          setSelectedID(index);
+          button.onClick();
+        }
+      }}
+      danger={button.danger}
+      color={button.color}
+      icon={button.icon}
+      type={selectedID == index || isBar ? button.type : 'default'}
+      disabled={button.disabled}
+    >
+      {button.label}
+    </Button>
+  )
   return (
     <>
       <Row className="w-full bg-white">
         <Col span={span[0]}>
           <Button.Group>
-            {btnChannle.map((button, index) => (
-              <Button
-                key={index}
-                loading={button.loading}
-                onClick={() => {
-                  setSelectedID(index);
-                  button.onClick();
-                }}
-                color={button.color}
-                icon={button.icon}
-                type={selectedID == index || isBar ? button.type : 'default'}
-                disabled={button.disabled}
-              >
-                {button.label}
-              </Button>
-            ))}
+            {btnChannle.map((button, index) =>
+              button.isPopConfirm ? (
+                <Popconfirm
+                  key={index}
+                  title={button.popConfirmTitle}
+                  onConfirm={() => {
+                    button.onClick()
+                  }}
+                >
+                  {renderButton(button, index)}
+                </Popconfirm>
+              ): renderButton(button, index, true)
+              
+            )}
             {isUpload && (
               <Upload {...uploadProps?.props}>
                 <Button
