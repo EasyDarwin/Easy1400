@@ -51,7 +51,16 @@ export const onRouteChange = ({ location }: any) => {
 
 export function patchClientRoutes({ routes }: any) {
   if (!getConfig('isAbout')) {
-    routes[1].routes[11].children[5] = {};
+    for(let i = 0; i < routes[1].children.length; i++){
+      if(routes[1].children[i].path === '/system'){
+        console.log(routes[1].children[i].path);
+        for(let j = 0;j < routes[1].children[i].children.length;j++){
+          if(routes[1].children[i].children[j].path === '/system/about'){
+            return routes[1].children[i].children[j] = {};
+          }
+        }
+      }
+    }
   }
 }
 
