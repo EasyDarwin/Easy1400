@@ -116,7 +116,7 @@ export default function Page() {
                 </Form.Item>
                 <div className="ml-1">
                   <img
-                    className="object-cover w-24 h-8 mt-1.5"
+                    className="object-cover w-24 h-8 mt-1.5 cursor-pointer"
                     src={captchaData?.base64}
                     onClick={() => refetch()}
                   />

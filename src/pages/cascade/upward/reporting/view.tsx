@@ -20,13 +20,13 @@ const { RangePicker } = DatePicker;
 const Notification: React.FC = () => {
   const [searchParams, _] = useSearchParams();
   const upID = searchParams.get('up_id') ?? '';
-  const [form] = Form.useForm<Cascade.NotificationListReq>();
-  const [loadings, setLoadings] = useState<string[]>([]);
   const [infoTypes] = useState<any[]>([
     { value: 'FaceObjectList', label: '人脸' },
     { value: 'PersonObjectList', label: '人员' },
     { value: 'MotorVehicleObjectList', label: '机动车' },
     { value: 'NonMotorVehicleObjectList', label: '非机动车' },
+    { value: 'DeviceList', label: '采集设备目录' },
+    { value: 'DeviceStatusList', label: '采集设备状态' },
   ]);
   const infoTypeEnums = infoTypes.reduce((pre = {} , cur) => ({ ...pre, [cur.value]: cur.label }), {})
   const InfoModalRef = useRef<IInfoModalRef>();
@@ -47,7 +47,7 @@ const Notification: React.FC = () => {
     },
     {
       title: '设备名称',
-      dataIndex: 'device_name',
+      dataIndex: 'device_Name',
       align: 'center',
       width: 180,
     },
@@ -97,9 +97,9 @@ const Notification: React.FC = () => {
           <Space>
             <Tooltip title="记录详情">
               <Button
-                onClick={() =>
+                onClick={() => {
                   InfoModalRef.current?.init(record.info_ids.replace('ObjectList', ''), record)
-                }
+                }}
                 icon={<TagsOutlined />}
               />
             </Tooltip>
@@ -132,8 +132,7 @@ const Notification: React.FC = () => {
             start_at: timeRange[0].unix(),
             end_at: timeRange[1].unix(),
           } : {}
-        }).then((res: AxiosResponse) => res.data)
-      },
+        }).then((res: AxiosResponse) => res.data)},
       {
         refetchInterval: 10000,
         onError: ErrorHandle,

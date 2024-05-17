@@ -7,6 +7,7 @@ import {
   // BellOutlined,
   CloudUploadOutlined,
   DeleteOutlined,
+  EditOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
@@ -22,7 +23,7 @@ import {
 } from '@/services/http/cascade';
 import { ErrorHandle } from '@/services/http/http';
 import CascadeFrom, { ICascadeRef } from './components/CascadeFrom';
-import DeviceFrom, { IDeviceRef } from './components/DeviceFrom';
+// import DeviceFrom, { IDeviceRef } from './components/DeviceFrom';
 
 const View: React.FC = () => {
   const columns: ColumnsType<Cascade.Item> = [
@@ -31,7 +32,8 @@ const View: React.FC = () => {
       dataIndex: 'id',
       align: 'center',
       fixed: true,
-      width: 230,
+      ellipsis: true,
+      width: 200,
     },
     {
       title: '名称',
@@ -44,7 +46,7 @@ const View: React.FC = () => {
       title: '状态',
       dataIndex: 'status',
       align: 'center',
-      width: 120,
+      width: 100,
       render: (text: string) => (
         <Tag color={text == 'OK' ? 'green' : 'red'}>
           {text == 'OK' ? '在线' : '离线'}
@@ -81,7 +83,7 @@ const View: React.FC = () => {
       title: '操作',
       align: 'center',
       fixed: 'right',
-      width: 180,
+      width: 220,
       render: (text: string, record: Cascade.Item) => {
         return (
           <Space>
@@ -90,6 +92,11 @@ const View: React.FC = () => {
                 history.push(`/cascade/dispositions`)
               }} icon={<ClusterOutlined />} />
             </Tooltip> */}
+            <Tooltip title="编辑">
+              <Button icon={<EditOutlined />} onClick={() => {
+                cascadeRef.current?.setFieldsValue(record, true)
+              }} />
+            </Tooltip> 
             <Tooltip title="上级的订阅">
               <Button
                 onClick={() => {
@@ -109,24 +116,12 @@ const View: React.FC = () => {
                 }}
                 icon={<CloudUploadOutlined />}
               />
-              {/* <Button
-                onClick={() => {
-                  history.push(
-                    `/upward/cascade/notification?device_id=${record.id}`,
-                  );
-                }}
-                icon={<BellOutlined />}
-              /> */}
             </Tooltip>
             <Tooltip title="选择共享设备">
               <Button
                 className={record.device_ids?.length > 0 ? 'text-yellow-500 border-dashed border-yellow-500' : ''}
                 onClick={() => {
                   history.push(`/upward/cascade/device/${record.id}`)
-                  // deviceRef.current?.setFieldsValue({
-                  //   id: record.id,
-                  //   device_ids: record.device_ids || [],
-                  // });
                 }}
                 icon={<ApiOutlined />}
               />
@@ -172,7 +167,6 @@ const View: React.FC = () => {
     },
   ];
   const cascadeRef = useRef<ICascadeRef>();
-  const deviceRef = useRef<IDeviceRef>();
 
   const [loadings, setLoadings] = useState<string[]>([]);
   const { mutate: deleteCascadeMutate, isLoading: deleteCascadeLoading } =
@@ -235,7 +229,6 @@ const View: React.FC = () => {
         />
       </Box>
       <CascadeFrom ref={cascadeRef} />
-      <DeviceFrom ref={deviceRef} />
     </PageContainer>
   );
 };

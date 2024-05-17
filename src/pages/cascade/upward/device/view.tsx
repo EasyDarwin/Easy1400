@@ -107,6 +107,7 @@ const View: React.FC = () => {
     [findCascadeShare, platformID],
     () => FindCascadeShare(platformID).then((res: any) => res.data),
     {
+      refetchInterval: 10000,
       onError: ErrorHandle,
     },
   );

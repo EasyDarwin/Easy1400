@@ -1,19 +1,22 @@
 import { FindDownwardNotificationJson } from '@/services/http/cascade';
-import { Image, Modal, Spin, Typography } from 'antd';
+import { Image, Modal, Typography, Space, Descriptions } from 'antd';
+import { getImgURL } from '@/package/path/path';
+import { timeToFormatTime } from '@/package/time/time';
 import { AxiosResponse } from 'axios';
+import ColumnItems from '@/pages/gallery/components/ColumnItems'
 import React, {
-  forwardRef,
   useImperativeHandle,
-  useRef,
+  forwardRef,
   useState,
 } from 'react';
 import ReactJson from 'react-json-view';
+import { getAttrConfig, setAttrConfig } from "@/services/store/local";
+import AttributeText from '@/components/attribute/AttributeText';
 
 export interface InfoModalRef {
   openModal: (data: Cascade.DownwardNotificationItem) => void;
 }
 
-//TODO 这里因为接口需求，需要根据不同字段取出不同的值
 const InfoModal: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
   useImperativeHandle(ref, () => ({
     openModal: (data: Cascade.DownwardNotificationItem) => {
@@ -23,105 +26,112 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
     },
   }));
 
-  const [data, setData] = useState<Cascade.DownwardNotificationItem>();
-  const [deviceID, setDeviceID] = useState('');
-  const [allData,setAllData] = useState();
+  const [data, setData] = useState<any>({});
+  const [allData, setAllData] = useState<any>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [currentItems, setCurrentItems] = useState<any[]>([])
 
-  const objectKeyList = useRef<string[]>([]);
-  const [imgData, setImageData] = useState<Gallery.SubImageList>();
-  const key = useRef('');
+  const [imageData, setImageData] = useState<Gallery.SubImageList>();
+
   const getJson = (url: string) => {
     FindDownwardNotificationJson(url).then((res: AxiosResponse) => {
-      getDataList(res.data.InfoIDs);
-      setAllData(res.data)
-      key.current = res.data.InfoIDs;
-      const data =
-        res.data[objectKeyList.current[0]][objectKeyList.current[1]][
-          objectKeyList.current[2]
-        ];
-      if (data.length != 0) {
-        setDeviceID(data[0].DeviceID);
-        setImageData(data[0].SubImageList);
-      } else {
-        setImageData(undefined);
+      const type = res.data.InfoIDs?.replace('ObjectList', '')
+      const configColumns = ColumnItems?.[type]
+      if (!configColumns?.length) {
+        setAllData(res.data)
+        setCurrentItems([])
+        setImageData({ SubImageInfoObject: [] })
+        return
       }
+      const item = res.data[type + 'ObjectList']?.[type + 'ListObject']?.[type + 'Object']?.[0] || {}
+      setData(item)
+      setCurrentItems(configColumns)
+      setImageData(item.SubImageList || [])
     });
   };
 
-  const getDataList = (key: string) => {
-    switch (key) {
-      case 'DeviceList':
-        return;
-      case 'FaceObjectList':
-        objectKeyList.current = [
-          'FaceObjectList',
-          'FaceListObject',
-          'FaceObject',
-        ];
-        return;
-      case 'PersonObjectList':
-        objectKeyList.current = [
-          'PersonObjectList',
-          'PersonListObject',
-          'PersonObject',
-        ];
-        return;
-      case 'MotorVehicleObjectList':
-        objectKeyList.current = [
-          'MotorVehicleObjectList',
-          'MotorVehicleListObject',
-          'MotorVehicleObject',
-        ];
-        return;
-      case 'NonMotorVehicleObjectList':
-        objectKeyList.current = [
-          'NonMotorVehicleObjectList',
-          'NonMotorVehicleListObject',
-          'NonMotorVehicleObject',
-        ];
-        return;
-      default:
-        return;
-    }
-  };
+  const getDescItem = (item: any) => {
+    let text = data[item.code]
+    if (!text) return '-'
+    if (item.format) return item.format[text]
+    if (item.type === 'time') return timeToFormatTime(text)
+    if (item.type === 'attribute') return <AttributeText code={item.code} value={text} />
+    if (item.type === 'image')
+      return (
+        <Image
+          src={getImgURL(text)}
+          style={{ height: '80px' }}
+          preview={{ src: getImgURL(text) }}
+          onError={(e: any) => {
+            e.target.src = './noImg.png';
+          }}
+        />
+      )
+    return text
+  }
+
 
   const onCancel = () => {
-    key.current = '';
+    setCurrentItems([])
+    setAllData({})
+    setImageData({ SubImageInfoObject: [] })
     setIsModalOpen(false);
   };
 
   return (
     <Modal
-      title={`设备ID ${deviceID}`}
+      title={data.DeviceID ? `设备ID：${data.DeviceID}` : '详情'}
       open={isModalOpen}
       onCancel={onCancel}
       footer={null}
       centered
       width="60%"
     >
-      <Spin spinning={isLoading} />
-      {key.current !== 'DeviceList' && (
-        <div className="flex py-2">
-          {imgData?.SubImageInfoObject.map(
-            (item: Gallery.SubImageInfoObject) => (
-              <div key={item.ImageID} className="mr-5">
-                <Image
-                  onError={(e: any) => {
-                    e.target.src = './noImg.png';
-                  }}
-                  style={{ height: '300px' }}
-                  src={`data:image/jpeg;base64,${item.Data}`}
-                ></Image>
-              </div>
-            ),
-          )}
-        </div>
-      )}
+      {
+        !!imageData?.SubImageInfoObject?.length && (
+          <Image.PreviewGroup>
+            <Space size="middle">
+                {imageData?.SubImageInfoObject.map(
+                  (item: Gallery.SubImageInfoObject) => (
+                    <Image
+                      key={item.ImageID}
+                      style={{ height: '300px' }}
+                      src={`data:image/jpeg;base64,${item.Data}`}
+                      // src={`${getImgURL(item.Data)}?h=300`}
+                      preview={{
+                        src: `data:image/jpeg;base64,${item.Data}`
+                        // src: getImgURL(item.Data),
+                      }}
+                      onError={(e: any) => {
+                        e.target.src = './noImg.png';
+                      }}
+                    />
+                  ),
+                )}
+    
+            </Space>
+          </Image.PreviewGroup>
+        )
+      }
       <div className=" whitespace-normal overflow-auto py-2">
-        <Typography.Title level={5}>通知结构</Typography.Title>
-        <ReactJson collapsed={true} src={allData || {}}></ReactJson>
+      {
+        currentItems?.length ? (
+          <Descriptions title="明细" column={4}>
+            {
+              currentItems.map((item: any) => (
+                <Descriptions.Item key={item.code} label={item.label} span={item.span || 1}>
+                  {getDescItem(item)}
+                </Descriptions.Item>
+              ))
+            }
+          </Descriptions>
+        ) : (
+          <>
+            <Typography.Title level={5}>通知结构</Typography.Title>
+            <ReactJson collapsed={true} src={allData || {}} />
+          </>
+        )
+      }
       </div>
     </Modal>
   );

@@ -63,10 +63,6 @@ export async function DelNonMotorVehicle(data: string) {
   return await DELETE(`/VIID/NonMotorVehicles/${data}`);
 }
 
-
-
-
-
 //图库请求 为了通知详情暂时封装
 export async function findGalleryData(data:{url:string;id:string}){
   return await GET(`${data.url}`,{

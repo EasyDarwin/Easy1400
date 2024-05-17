@@ -72,7 +72,6 @@ const Notification: React.FC = () => {
     },
   ];
 
-  const [loadings, setLoadings] = useState<string[]>([]);
   const infoModalRef = useRef<InfoModalRef>();
 
   const [pagination, setPagination] = useState<Cascade.DispositionsListReq>({

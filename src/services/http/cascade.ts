@@ -6,10 +6,15 @@ export async function FindCascadeLists(data: Cascade.ListReq) {
   return await GET('/cascades', data);
 }
 
-//添加级联
-export async function AddCascade(data: Cascade.AddReq) {
+// 添加级联 / 更新级联
+export async function SaveCascade(data: Cascade.AddReq) {
+  const { id, ...others } = data
+  if (id) {
+    return await PUT(`/cascades/${id}`, others);
+  }
   return await POST(`/cascades`, data);
 }
+
 
 //删除级联
 export async function DelCascade(id: string) {
@@ -23,6 +28,16 @@ export async function EditSelectDevice(data: {
 }) {
   return await PUT(`/cascades/${data.id}/devices`, {
     device_ids: data.device_ids,
+  });
+}
+
+// 向上共享
+export async function EditSelectPlatforms(data: {
+  id: string;
+  cascade_ids: string[];
+}) {
+  return await PUT(`/platforms/${data.id}/restrict`, {
+    cascade_ids: data.cascade_ids,
   });
 }
 

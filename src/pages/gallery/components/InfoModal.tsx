@@ -5,45 +5,57 @@ import { getImgURL } from '@/package/path/path';
 import { timeToFormatTime } from '@/package/time/time';
 import { ErrorHandle } from '@/services/http/http';
 import { AxiosResponse } from 'axios';
-import { ColumnItems } from './ColumnItems'
-
+import ColumnItems from './ColumnItems'
+import ReactJson from 'react-json-view';
 export interface IInfoModalRef {
   init: (key: string, info: any) => void;
 }
 
 const InfoModal: React.FC<{ ref: any }> = forwardRef<IInfoModalRef>(
   ({ }, ref) => {
+    useImperativeHandle(ref, () => ({
+      init: (v: string, info: any) => {
+        setVisible(true);
+        setInfo(info)
+        const configColumns = ColumnItems?.[v]
+        if (!configColumns?.length) {
+          setAllData(info)
+          setCurrentItems([])
+          setImageData({ SubImageInfoObject: [] })
+          return
+        }
+        setCurrentItems(configColumns)
+        getInfoData(v)
+      },
+    }));
 
     const [visible, setVisible] = useState<boolean>(false);
-    const [data, setData] = useState<any>({});
-    const [key, setKey] = useState<string>('');
+    const [allData, setAllData] = useState<any>({})
+    const [info, setInfo] = useState<any>({});
+    const [currentItems, setCurrentItems] = useState<any[]>([])
     const [imageData, setImageData] = useState<Gallery.SubImageList>({
       SubImageInfoObject: []
     });
 
-    const currentItems = useMemo(() => key ? ColumnItems[key] : [], [key])
-
     const onCancel = () => {
-      setKey('')
+      setCurrentItems([])
+      setAllData({})
+      setInfo({})
+      setImageData({ SubImageInfoObject: [] })
       setVisible(false)
     };
 
-    useEffect(() => {
-      getInfoData()
-    }, [key])
-
-    const getInfoData = () => {
-      if (!key) return
-      if (data.DeviceID) return
+    const getInfoData = (key: any) => {
+      if (allData.DeviceID) return
 
       findGalleryData({
         url: `/VIID/${key}s`,
-        id: data?.object_id ?? '',
+        id: allData?.object_id ?? '',
       })
         .then((res: AxiosResponse) => {
-          const currentData = res.data?.[`${key}ListObject`]?.[`${key}Object`] || []
-          setData(currentData[0])
-          setImageData(currentData[0]?.SubImageList || {});
+          const currentData = res.data?.[`${key}ListObject`]?.[`${key}Object`]?.[0] || {}
+          setAllData(currentData)
+          setImageData(currentData?.SubImageList || []);
         })
         .catch((error: Error) => {
           ErrorHandle(error);
@@ -51,7 +63,7 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef<IInfoModalRef>(
     }
 
     const getDescItem = (item: any) => {
-      let text = data[item.code]
+      let text = allData[item.code]
       if (!text) return '-'
       if (item.format) return item.format[text]
       if (item.type === 'time') return timeToFormatTime(text)
@@ -69,57 +81,58 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef<IInfoModalRef>(
       return text
     }
 
-    useImperativeHandle(ref, () => ({
-      init: (key: string, info: any) => {    
-        setKey(key)
-        if (info.DeviceID) {
-          // 图库
-          setData(info);
-          setImageData(info?.SubImageList || [])
-        }
-        setVisible(true);
-      },
-    }));
-
     return (
       <Modal
-        title={data?.DeviceID ? `设备ID：${data.DeviceID}` : '详情'}
+        title={info?.device_id ? `设备ID：${info.device_id}` : '详情'}
         open={visible}
         onCancel={onCancel}
         footer={null}
         centered
         width="80%"
       >
-        <Image.PreviewGroup>
-          <Space size="middle">
-            {imageData.SubImageInfoObject.map(
-            // {data?.SubImageList?.SubImageInfoObject.map(
-              (item: Gallery.SubImageInfoObject) => (
-                <Image
-                  key={item.ImageID}
-                  // style={{ height: '300px' }}
-                  src={`${getImgURL(item.Data)}?h=300`}
-                  preview={{
-                    src: getImgURL(item.Data),
-                  }}
-                  onError={(e: any) => {
-                    e.target.src = './noImg.png';
-                  }}
-                />
-              ),
-            )}
-          </Space>
-        </Image.PreviewGroup>
+        {
+          !!imageData?.SubImageInfoObject?.length && (
+            <Image.PreviewGroup>
+              <Space size="middle">
+                {imageData.SubImageInfoObject.map(
+                  // {data?.SubImageList?.SubImageInfoObject.map(
+                  (item: Gallery.SubImageInfoObject) => (
+                    <Image
+                      key={item.ImageID}
+                      // style={{ height: '300px' }}
+                      src={`${getImgURL(item.Data)}?h=300`}
+                      preview={{
+                        src: getImgURL(item.Data),
+                      }}
+                      onError={(e: any) => {
+                        e.target.src = './noImg.png';
+                      }}
+                    />
+                  ),
+                )}
+              </Space>
+            </Image.PreviewGroup>
+          )
+        }
         <div className="whitespace-normal overflow-auto py-2">
-          <Descriptions title="明细" column={4}>
-            {
-              currentItems.map((item: any) => (
-                <Descriptions.Item key={item.code} label={item.label} span={item.span || 1}>
-                  {getDescItem(item)}
-                </Descriptions.Item>
-              ))
-            }
-          </Descriptions>
+          {
+            currentItems?.length ? (
+              <Descriptions title="明细" column={4}>
+                {
+                  currentItems.map((item: any) => (
+                    <Descriptions.Item key={item.code} label={item.label} span={item.span || 1}>
+                      {getDescItem(item)}
+                    </Descriptions.Item>
+                  ))
+                }
+              </Descriptions>
+            ) : (
+              <>
+                <Typography.Title level={5}>通知结构</Typography.Title>
+                <ReactJson collapsed={true} src={allData || {}} />
+              </>
+            )
+          }
         </div>
       </Modal>
     )

@@ -1,3 +1,4 @@
+// TODO: 标记字典类型
 const commonPersonItems = [
   { label: '证件种类', code: 'IDType' },
   { label: '证件号码', code: 'IDNumber' },
@@ -59,7 +60,7 @@ const commonPersonItems = [
   { label: '疤痕酒窝', code: 'ScarDimple' },
   { label: '其他特征', code: 'OtherFeature' },
 ]
-export const ColumnItems: any = {
+const ColumnItems = {
   // 人脸
   'Face': [
     { label: '人脸标识', code: 'FaceID' },
@@ -205,4 +206,5 @@ export const ColumnItems: any = {
     { label: '贴膜颜色', code: 'FilmColor' },
     { label: '改装标志', code: 'IsModified' },
   ]
-}
+} as any
+export default ColumnItems

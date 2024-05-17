@@ -1,12 +1,12 @@
 import { history, useMutation, useQuery } from '@umijs/max';
 import React, { useRef, useState } from 'react';
-
 import {
   ApartmentOutlined,
   DeleteOutlined,
   FileTextOutlined,
   FormOutlined,
   PlusOutlined,
+  ApiOutlined,
 } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import {
@@ -33,8 +33,19 @@ import { ErrorHandle } from '@/services/http/http';
 import { getConfig } from '@/services/store/local';
 import { AxiosResponse } from 'axios';
 import DownCascadeFrom, { IDownCascadeRef } from './components/DownCascadeFrom';
+import CascadeModal, { ICascadeModalRef } from './components/CascadeModal';
 
 const View: React.FC = () => {
+  const downCascadeRef = useRef<IDownCascadeRef>();
+  const cascadeModalRef = useRef<ICascadeModalRef>();
+  /** 查询数据 */
+  const [pagination, setPagination] = useState<Cascade.ListReq>({
+    page: 1,
+    size: 10,
+    value: '',
+    status: '',
+  });
+  const [loadings, setLoadings] = useState<string[]>([]);
   const columns: ColumnsType<Cascade.DownItem> = [
     {
       title: 'ID',
@@ -91,7 +102,7 @@ const View: React.FC = () => {
       title: '操作',
       align: 'center',
       fixed: 'right',
-      width: 180,
+      width: 230,
       render: (_: string, record: Cascade.DownItem) => {
         return (
           <Space>
@@ -132,6 +143,17 @@ const View: React.FC = () => {
                 />
               </Tooltip>
             )}
+            <Tooltip title="关联上级平台">
+              <Button
+                onClick={() => {
+                  cascadeModalRef.current?.openModal({
+                    id: record.id,
+                    cascade_ids: record?.cascade_ids || [],
+                  });
+                }}
+                icon={<ApiOutlined />}
+              />
+            </Tooltip>
             <Tooltip title="删除">
               <Popconfirm
                 title={
@@ -158,8 +180,6 @@ const View: React.FC = () => {
       },
     },
   ];
-  const downCascadeRef = useRef<IDownCascadeRef>();
-
   const funcBtnList: ButtonList[] = [
     //顶部按钮列表
     {
@@ -174,7 +194,6 @@ const View: React.FC = () => {
   ];
 
   //删除下级视图库
-  const [loadings, setLoadings] = useState<string[]>([]);
   const { mutate: deleteCascadeMutate } = useMutation(DelDownwardCascade, {
     onMutate: (v: string) => {
       setLoadings([...loadings, v]);
@@ -190,14 +209,6 @@ const View: React.FC = () => {
     },
   });
 
-  /** 查询数据 */
-  const [pagination, setPagination] = useState<Cascade.ListReq>({
-    page: 1,
-    size: 10,
-    value: '',
-    status: '',
-  });
-
   const {
     data: cascadeData,
     isLoading: cascadeLoading,
@@ -209,7 +220,7 @@ const View: React.FC = () => {
         (res: AxiosResponse<Cascade.DownListRes>) => res.data,
       ),
     {
-      refetchInterval: 10000,
+      // refetchInterval: 10000,
       onError: (error: Error) => ErrorHandle(error),
     },
   );
@@ -242,7 +253,7 @@ const View: React.FC = () => {
   );
 
   return (
-    <PageContainer title={process.env.PAGE_TITLE} style={{ height: 'calc(100vh - 26px)'}}>
+    <PageContainer title={process.env.PAGE_TITLE} style={{ height: 'calc(100vh - 26px)' }}>
       <Box>
         <FunctionBar
           btnChannle={funcBtnList}
@@ -270,6 +281,8 @@ const View: React.FC = () => {
         />
       </Box>
       <DownCascadeFrom ref={downCascadeRef} />
+      {/* <DeviceFrom ref={deviceModalRef} /> */}
+      <CascadeModal ref={cascadeModalRef} />
     </PageContainer>
   );
 };

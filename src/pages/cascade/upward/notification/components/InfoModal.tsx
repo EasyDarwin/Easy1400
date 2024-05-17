@@ -87,7 +87,6 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
   }, [mapKey.current]);
 
   // TODO 这里优化，拆分，将图库改造成这种写法
-
   const getDataList = () => {
     switch (mapKey.current) {
       case 'DeviceList':

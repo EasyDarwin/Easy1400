@@ -122,7 +122,7 @@ const Notification: React.FC = () => {
         (res: AxiosResponse) => res.data,
       ),
     {
-      refetchInterval: 100000,
+      refetchInterval: 10000,
       onError: ErrorHandle,
     },
   );

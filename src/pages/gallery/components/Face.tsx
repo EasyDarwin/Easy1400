@@ -123,7 +123,7 @@ const Face: React.FC = () => {
   ];
 
   const [pagination, setPagination] = useState<Gallery.Pager>({
-    PageRecordNum: 20,
+    PageRecordNum: 30,
     RecordStartNo: 1,
     DeviceID: sharedData.deviceID || '',
     start_at: sharedData.searchTimeValue?.start,

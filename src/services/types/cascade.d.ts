@@ -61,8 +61,8 @@ declare namespace Cascade {
   };
 
   type DispositionsListReq = {
-    PageRecordNum: number;
-    RecordStartNo: number;
+    PageRecordNum?: number;
+    RecordStartNo?: number;
     up_id?: string;
   };
 
@@ -142,6 +142,7 @@ declare namespace Cascade {
     remote_port: number;
     update_at?: string;
     user_name: string;
+    cascade_ids?: string[];
   };
 
   type DownReq = {
