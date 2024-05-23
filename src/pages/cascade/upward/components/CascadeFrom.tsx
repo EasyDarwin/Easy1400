@@ -1,11 +1,12 @@
 import { SaveCascade, getCascades } from '@/services/http/cascade';
 import { ErrorHandle } from '@/services/http/http';
 import { FindSystemInfo, findSystemInfo } from '@/services/http/system';
+import { GetGroupList } from '@/services/http/groups';
 import { useMutation, useQuery, useQueryClient } from '@umijs/max';
-import { Form, Input, InputNumber, Modal, Switch, message } from 'antd';
+import { Form, Input, InputNumber, Modal, Select, Switch, message } from 'antd';
 import { AxiosResponse } from 'axios';
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import OrgTreeSelect from './OrgTreeSelect'
+// import OrgTreeSelect from './OrgTreeSelect'
 
 export interface ICascadeRef {
   setFieldsValue: (data?: any, type?: boolean) => void;
@@ -14,24 +15,28 @@ export interface ICascadeRef {
 const CascadeFrom: React.FC<{ ref: any }> = forwardRef(({ }, ref) => {
   useImperativeHandle(ref, () => ({
     setFieldsValue: (v: any, isEdit?: boolean) => {
-      if (v) setGroupId(v.virtual_group_id)
+      // if (v) setGroupId(v.virtual_group_id)
       setModalVisible(true);
       setIsEdit(isEdit || false);
       setTimeout(() => {
         form.setFieldsValue(v);
       }, 0)
+      GetGroupList('0').then((res: AxiosResponse) => {
+        setOptions(res.data)
+      })
     },
   }));
   const queryClient = useQueryClient();
   const [form] = Form.useForm(); // 表单数据
   const [isEdit, setIsEdit] = useState<boolean>(false);
-  const [groupId, setGroupId] = useState<any>();
+  // const [groupId, setGroupId] = useState<any>();
+  const [options, setOptions] = useState<any>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   const { mutate: saveMutate, isLoading: saveLoading } =
     useMutation(SaveCascade, {
       onSuccess() {
-        message.success(isEdit ? '编辑' : '新增成功');
+        message.success(isEdit ? '编辑成功' : '新增成功');
         queryClient.invalidateQueries([getCascades]);
         onClose();
       },
@@ -41,7 +46,7 @@ const CascadeFrom: React.FC<{ ref: any }> = forwardRef(({ }, ref) => {
   //关闭表单
   const onClose = () => {
     form.resetFields();
-    setGroupId('')
+    // setGroupId('')
     setModalVisible(false);
   };
 
@@ -72,7 +77,7 @@ const CascadeFrom: React.FC<{ ref: any }> = forwardRef(({ }, ref) => {
         labelAlign="left"
         labelCol={{ span: 6 }}
         onFinish={(v: Cascade.AddReq) => {
-          saveMutate(v);
+          saveMutate({ ...v, isEdit });
         }}
       >
         <Form.Item hidden={isEdit} label="ID" name="id" rules={[{ required: true }]}>
@@ -98,13 +103,18 @@ const CascadeFrom: React.FC<{ ref: any }> = forwardRef(({ }, ref) => {
         <Form.Item label="Port" name="port" rules={[{ required: true }]}>
           <InputNumber className="w-full" placeholder="上级视图库端口" />
         </Form.Item>
-        <Form.Item label="是否启用" name="enabled" valuePropName="checked" rules={[{ required: true }]}>
+        <Form.Item label="是否启用" name="enabled" valuePropName="checked" initialValue={true} rules={[{ required: true }]}>
           <Switch checkedChildren="是" unCheckedChildren="否" />
         </Form.Item>
         {
           modalVisible && (
             <Form.Item label="虚拟组织" name="virtual_group_id">
-              <OrgTreeSelect label="虚拟组织" value={groupId} onChange={(v: any) => setGroupId(v)} />
+              <Select
+                placeholder="虚拟组织"
+                options={options} 
+                fieldNames={{ label: 'name', value: 'id' }}
+              />
+              {/* <OrgTreeSelect label="虚拟组织" value={groupId} onChange={(v: any) => setGroupId(v)} /> */}
             </Form.Item>
           )
         }

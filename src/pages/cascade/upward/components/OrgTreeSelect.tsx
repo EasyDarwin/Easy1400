@@ -1,6 +1,6 @@
 import React, { useEffect, useState, forwardRef, useImperativeHandle, Children } from 'react';
 import { TreeSelect } from 'antd';
-import { GetGroupList, GetGroupTree } from '@/services/http/groups';
+import { GetGroupList } from '@/services/http/groups';
 import { AxiosResponse } from 'axios';
 
 interface OrgTreeProps {

@@ -8,8 +8,8 @@ export async function FindCascadeLists(data: Cascade.ListReq) {
 
 // 添加级联 / 更新级联
 export async function SaveCascade(data: Cascade.AddReq) {
-  const { id, ...others } = data
-  if (id) {
+  const { id, isEdit, ...others } = data
+  if (isEdit) {
     return await PUT(`/cascades/${id}`, others);
   }
   return await POST(`/cascades`, data);

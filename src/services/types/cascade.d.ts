@@ -58,6 +58,9 @@ declare namespace Cascade {
      * 视图库用户名
      */
     username: string;
+
+    // 标记
+    isEdit?: boolean;
   };
 
   type DispositionsListReq = {
