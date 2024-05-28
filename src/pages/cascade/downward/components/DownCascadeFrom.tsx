@@ -87,13 +87,13 @@ const CascadeFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
     setModalVisible(false);
   };
 
-  //校验 验证code第11~13位必须为503
+  //校验 验证code第11~13位必须为503或120
   const validateCode = (_: any, value: string) => {
-    if (value.length !== 20) {
+    if (!value || value.length !== 20) {
       return Promise.reject(new Error('Code长度必须为20'));
     }
-    if (value && value.substring(10, 13) !== '503') {
-      return Promise.reject(new Error('第11~13位必须为503'));
+    if (!['503', '120'].includes(value.substring(10, 13)) ) {
+      return Promise.reject(new Error('第11~13位必须为503或120'));
     }
     return Promise.resolve();
   };

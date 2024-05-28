@@ -95,7 +95,7 @@ const View: React.FC = () => {
     <Box>
       <Table
         loading={isLoading}
-        rowKey={'ApeID'}
+        rowKey={'id'}
         key={'system_app_table_key'}
         scroll={{ x: 1000 }}
         columns={columns}

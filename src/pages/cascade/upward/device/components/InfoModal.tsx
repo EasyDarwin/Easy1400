@@ -19,19 +19,28 @@ export interface IInfoModalRef {
 
 const InfoModal: React.FC<{ ref: any }> = forwardRef(({ }, ref) => {
   useImperativeHandle(ref, () => ({
-    openModal: (v: Cascade.DeviceShareItem, edit: boolean) => {
-      if (edit) {
-        setData(v)
-      }
-      setVisible(true);
+    openModal: (data: Cascade.DeviceShareItem, edit: boolean) => {
       setEdit(edit || false)
+      setVisible(true);
+      setTimeout(() => {
+        if (data) {
+          setCheckList([data.APEID])
+          form.setFieldsValue({
+            platform: data.PlatformID,
+            // devices: [data.APEID],
+            person: data.Person,
+            face: data.Face,
+            motor_vehicle: data.MotorVehicle,
+            non_motor_vehicle: data.NonMotorVehicle,
+          })
+        }
+      }, 0)
     },
   }));
   const queryClient = useQueryClient();
   const platformID = useParams().platform_id ?? '';
   const [visible, setVisible] = useState(false);
   const [edit, setEdit] = useState(false);
-  const [data, setData] = useState<any>();
   const [form] = Form.useForm<Cascade.DeviceShareReq>(); // 表单数据
   const [checkList, setCheckList] = useState<React.Key[]>();
   const columns: ColumnsType<Device.APEObject> = [
@@ -43,20 +52,6 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef(({ }, ref) => {
     PageRecordNum: 20,
     RecordStartNo: 1,
   });
-
-  useEffect(() => {
-    if (visible && data) {
-      setCheckList([data.APEID])
-      form.setFieldsValue({
-        platform: data.PlatformID,
-        // devices: [data.APEID],
-        person: data.Person,
-        face: data.Face,
-        motor_vehicle: data.MotorVehicle,
-        non_motor_vehicle: data.NonMotorVehicle,
-      })
-    }
-  }, [visible]);
 
   const {
     data: deviceData,

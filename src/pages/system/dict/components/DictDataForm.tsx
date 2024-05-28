@@ -128,7 +128,7 @@ const AddDictDataView = forwardRef<IForwardRef, ChildProps>(
             <Input placeholder="字典值" />
           </Form.Item>
           <Form.Item label="排序" name="sort">
-            <InputNumber min={0} max={99} />
+            <InputNumber min={0} max={500} />
           </Form.Item>
           <Form.Item label="是否启用" name="enabled" initialValue={[true]}>
             <Radio.Group

@@ -38,8 +38,6 @@ const CascadeModal: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
       onError: ErrorHandle,
     },
   );
-
-  console.log('cascadeData', cascadeData);
   
   const { mutate: saveMutate, isLoading: saveLoading } = useMutation(EditSelectPlatforms, {
     onSuccess: () => {

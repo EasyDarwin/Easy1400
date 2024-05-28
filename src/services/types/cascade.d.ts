@@ -75,6 +75,7 @@ declare namespace Cascade {
   };
 
   type SubscribeObject = {
+    id?: string;
     ApplicantName?: string;
     ApplicantOrg?: string;
     BeginTime?: string;
@@ -156,7 +157,7 @@ declare namespace Cascade {
      */
     password: string;
     /**
-     * 第11~13位必须为503,长度为20
+     * 第11~13位必须为503或120,长度为20
      */
     platform_id: string;
     realm?: string;

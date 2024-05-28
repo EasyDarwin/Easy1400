@@ -1,6 +1,6 @@
 import { getCascades } from '@/services/http/cascade';
 import { ErrorHandle } from '@/services/http/http';
-import { useQuery, useQueryClient } from '@umijs/max';
+import { useQuery } from '@umijs/max';
 import { Form, Input, Select, Modal, Table, Button } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
@@ -9,17 +9,13 @@ export interface IAssociateUpRef {
   openModal: (v: { id: string; device_ids: string[] }) => void;
 }
 
-interface RecordType {
-  key: string;
-  title: string;
-  description: string;
-}
-
 const AssociateUp: React.FC<{ ref: any }> = forwardRef(({ }, ref) => {
   useImperativeHandle(ref, () => ({
     openModal: (v: { id: string; device_ids: string[] }) => {
-      form.setFieldsValue(v);
       setVisible(true);
+      setTimeout(() => {
+        form.setFieldsValue(v);
+      }, 0)
     },
   }));
 
@@ -34,7 +30,7 @@ const AssociateUp: React.FC<{ ref: any }> = forwardRef(({ }, ref) => {
     status: ''
   });
 
-  const columns: ColumnsType<Cascade.Item[]> = [
+  const columns: ColumnsType<Cascade.Item> = [
     {
       title: '平台名称',
       dataIndex: 'name',

@@ -107,7 +107,7 @@ const Subscribes: React.FC = () => {
     // },
   ];
 
-  const [loadings, setLoadings] = useState<string[]>([]);
+  // const [loadings, setLoadings] = useState<string[]>([]);
 
   //获取订阅类别字典列表
   const { data: hdirectionTypeList } = useQuery<Dict.DataItem[]>(
@@ -149,7 +149,7 @@ const Subscribes: React.FC = () => {
       <Box>
         <Table
           loading={subscribesLoading}
-          rowKey="id"
+          rowKey={"SubscribeID"}
           key={'system_app_table_key'}
           columns={columns}
           scroll={{ x: 1100 }}

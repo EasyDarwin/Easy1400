@@ -72,12 +72,7 @@ const CascadeFrom: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
     onError: ErrorHandle,
   });
 
-  const onChange = (
-    newTargetKeys: string[],
-    direction: TransferDirection,
-    moveKeys: string[],
-  ) => {
-    console.log(newTargetKeys, direction, moveKeys);
+  const onChange = (newTargetKeys: string[]) => {
     setTargetKeys(newTargetKeys);
   };
 

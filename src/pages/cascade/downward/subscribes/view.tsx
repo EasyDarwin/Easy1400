@@ -240,7 +240,7 @@ const SubScribes: React.FC = () => {
       <Box>
         <Table
           loading={subscribesLoading}
-          rowKey={'ApeID'}
+          rowKey={'id'}
           key={'system_app_table_key'}
           columns={columns}
           dataSource={subscribesData?.items}
