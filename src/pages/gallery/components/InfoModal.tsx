@@ -7,6 +7,8 @@ import { ErrorHandle } from '@/services/http/http';
 import { AxiosResponse } from 'axios';
 import ColumnItems from './ColumnItems'
 import ReactJson from 'react-json-view';
+import AttributeText from '@/components/attribute/AttributeText';
+
 export interface IInfoModalRef {
   init: (key: string, info: any) => void;
 }
@@ -17,6 +19,7 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef<IInfoModalRef>(
       init: (v: string, info: any) => {
         setVisible(true);
         setInfo(info)
+
         const configColumns = ColumnItems?.[v]
         if (!configColumns?.length) {
           setAllData(info)
@@ -65,9 +68,16 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef<IInfoModalRef>(
     const getDescItem = (item: any) => {
       let text = allData[item.code]
       if (!text) return '-'
-      if (item.format) return item.format[text]
-      if (item.type === 'time') return timeToFormatTime(text)
-      if (item.type === 'image')
+      if (item.format) {
+        return item.format[text]
+      }
+      if (item.type === 'time') {
+        return timeToFormatTime(text)
+      }
+      if (item.attrType) {
+        return <AttributeText code={item.attrType} value={text} multiple={item.multiple} />
+      }
+      if (item.type === 'image') {
         return (
           <Image
             src={getImgURL(text)}
@@ -78,7 +88,8 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef<IInfoModalRef>(
             }}
           />
         )
-      return text
+      }
+      return text + (item.unit || '')
     }
 
     return (

@@ -3,11 +3,15 @@ import { useEffect, useState } from "react";
 import { FindDictDatas } from '@/services/http/dict';
 import { AxiosResponse } from 'axios';
 
-const AttributeText: React.FC<{ code: string; value: any; }> = ({ code, value }) => {
+const AttributeText: React.FC<{ code: string; value: any; multiple?: boolean; }> = ({ code, value, multiple }) => {
   const [label, setLabel] = useState<string>('')
 
   const getLabel = (list: any[]) => {
-    return list.find((el: any) => el.value == value).label
+    if (!multiple) {
+      return list.find((el: any) => el.value == value).label
+    }
+    // 多选 用英文半角分号";"分隔
+    return value.split(';').map((v: any) => list.find((el: any) => el.value == v).label).join(';')
   }
 
   useEffect(() => {

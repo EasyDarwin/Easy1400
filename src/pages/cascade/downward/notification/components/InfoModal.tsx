@@ -10,7 +10,6 @@ import React, {
   useState,
 } from 'react';
 import ReactJson from 'react-json-view';
-import { getAttrConfig, setAttrConfig } from "@/services/store/local";
 import AttributeText from '@/components/attribute/AttributeText';
 
 export interface InfoModalRef {
@@ -53,10 +52,16 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
   const getDescItem = (item: any) => {
     let text = data[item.code]
     if (!text) return '-'
-    if (item.format) return item.format[text]
-    if (item.type === 'time') return timeToFormatTime(text)
-    if (item.type === 'attribute') return <AttributeText code={item.code} value={text} />
-    if (item.type === 'image')
+    if (item.format) {
+      return item.format[text]
+    }
+    if (item.type === 'time') {
+      return timeToFormatTime(text)
+    }
+    if (item.attrType) {
+      return <AttributeText code={item.attrType} value={text} multiple={item.multiple} />
+    }
+    if (item.type === 'image') {
       return (
         <Image
           src={getImgURL(text)}
@@ -67,7 +72,8 @@ const InfoModal: React.FC<{ ref: any }> = forwardRef(({}, ref) => {
           }}
         />
       )
-    return text
+    }
+    return text + (item.unit || '')
   }
 
 
