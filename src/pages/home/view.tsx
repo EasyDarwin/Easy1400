@@ -4,6 +4,8 @@ import { onCopyValue } from '@/package/copy/copy';
 import { datePickerToTimestamp } from '@/package/time/time';
 import { ErrorHandle } from '@/services/http/http';
 import {
+  FindLinkData,
+  findLinkData,
   FindStatistics,
   FindSystemInfo,
   findSystemInfo,
@@ -112,6 +114,95 @@ export default function Page() {
     },
   ];
 
+  const { data: linkData } = useQuery([findLinkData], () => FindLinkData().then((res: AxiosResponse<System.LinkData>) => res.data), {
+    onError: ErrorHandle,
+  })
+
+  const collectionItems: DescriptionsProps['items'] = [
+    {
+      key: '1',
+      label: '接入设备总数',
+      children: (
+        <span>
+          {linkData?.devices.count ?? ''}
+          <CopyIcon value={String(linkData?.devices.count)} />
+        </span>
+      ),
+    },
+    {
+      key: '2',
+      label: '在线设备数',
+      children: (
+        <span>
+          {linkData?.devices.online_count ?? ''}
+          <CopyIcon value={String(linkData?.devices.online_count)} />
+        </span>
+      ),
+    },
+    {
+      key: '3',
+      label: '上级平台总数',
+      children: (
+        <span>
+          {linkData?.cascade.count ?? ''}
+          <CopyIcon value={String(linkData?.cascade.count)} />
+        </span>
+      ),
+    },
+    {
+      key: '4',
+      label: '在线上级平台数',
+      children: (
+        <span>
+          {linkData?.cascade.online_count ?? ''}
+          <CopyIcon value={String(linkData?.cascade.online_count)} />
+        </span>
+      ),
+    },
+    {
+      key: '5',
+      label: '下级平台总数',
+      children: (
+        <span>
+          {linkData?.platform.count ?? ''}
+          <CopyIcon value={String(linkData?.platform.count)} />
+        </span>
+      ),
+    },
+    {
+      key: '6',
+      label: '在线下级平台数',
+      children: (
+        <span>
+          {linkData?.platform.online_count ?? ''}
+          <CopyIcon value={String(linkData?.platform.online_count)} />
+        </span>
+      ),
+    },
+    {
+      key: '7',
+      label: '向上推送数',
+      children: (
+        <span>
+          {linkData?.notifications ?? ''}
+          <CopyIcon value={String(linkData?.notifications)} />
+        </span>
+      ),
+    },
+    {
+      key: '8',
+      label: '下级接受数',
+      children: (
+        <span>
+          {linkData?.subscription ?? ''}
+          <CopyIcon value={String(linkData?.subscription)} />
+        </span>
+      ),
+    }
+  ]
+
+
+
   const config = {
     title: {
       visible: true,
@@ -146,12 +237,12 @@ export default function Page() {
   ) => {
     if (Array.isArray(value) && value.length === 2) {
       const time = datePickerToTimestamp(value)
-        setQuery({ ...query, start: time?.start ?? 0, end: time?.end ?? 0 });
+      setQuery({ ...query, start: time?.start ?? 0, end: time?.end ?? 0 });
     }
   };
 
   //一键复制信息
-  const onClickCopyInfo = () =>{
+  const onClickCopyInfo = () => {
     let data = {
       platform_id: infoData?.username ?? '',
       user_name: infoData?.username ?? '',
@@ -178,6 +269,7 @@ export default function Page() {
         <Box style={{ width: '600px', marginLeft: '22px' }}>
           <Descriptions column={2} title="系统信息" items={items} />
           <Button onClick={onClickCopyInfo}>一键复制</Button>
+          <Descriptions className='mt-4' column={2} title="采集信息" items={collectionItems} />
         </Box>
       </div>
     </PageContainer>

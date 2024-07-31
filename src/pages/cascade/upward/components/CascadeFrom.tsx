@@ -1,12 +1,10 @@
 import { SaveCascade, getCascades } from '@/services/http/cascade';
 import { ErrorHandle } from '@/services/http/http';
 import { FindSystemInfo, findSystemInfo } from '@/services/http/system';
-import { GetGroupList } from '@/services/http/groups';
 import { useMutation, useQuery, useQueryClient } from '@umijs/max';
 import { Form, Input, InputNumber, Modal, Select, Switch, message } from 'antd';
 import { AxiosResponse } from 'axios';
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
-// import OrgTreeSelect from './OrgTreeSelect'
 
 export interface ICascadeRef {
   setFieldsValue: (data?: any, type?: boolean) => void;
@@ -21,16 +19,12 @@ const CascadeFrom: React.FC<{ ref: any }> = forwardRef(({ }, ref) => {
       setTimeout(() => {
         form.setFieldsValue(v);
       }, 0)
-      GetGroupList('0').then((res: AxiosResponse) => {
-        setOptions(res.data)
-      })
     },
   }));
   const queryClient = useQueryClient();
   const [form] = Form.useForm(); // 表单数据
   const [isEdit, setIsEdit] = useState<boolean>(false);
   // const [groupId, setGroupId] = useState<any>();
-  const [options, setOptions] = useState<any>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   const { mutate: saveMutate, isLoading: saveLoading } =
@@ -106,18 +100,6 @@ const CascadeFrom: React.FC<{ ref: any }> = forwardRef(({ }, ref) => {
         <Form.Item label="是否启用" name="enabled" valuePropName="checked" initialValue={true} rules={[{ required: true }]}>
           <Switch checkedChildren="是" unCheckedChildren="否" />
         </Form.Item>
-        {
-          modalVisible && (
-            <Form.Item label="虚拟组织" name="virtual_group_id">
-              <Select
-                placeholder="虚拟组织"
-                options={options} 
-                fieldNames={{ label: 'name', value: 'id' }}
-              />
-              {/* <OrgTreeSelect label="虚拟组织" value={groupId} onChange={(v: any) => setGroupId(v)} /> */}
-            </Form.Item>
-          )
-        }
       </Form>
     </Modal>
   );

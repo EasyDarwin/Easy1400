@@ -22,3 +22,8 @@ export async function FindStatistics(data:any) {
   return await GET<System.Statistics>(`/system/statistics`,data);
 }
 
+//设备及平台链接数据查询
+export const findLinkData = 'FindLinkData';
+export async function FindLinkData() {
+  return await GET<System.LinkData>(`/system/links/status`);
+}

@@ -85,17 +85,6 @@ export default defineConfig({
       hideInMenu: true,
     },
     {
-      name: '虚拟组织',
-      path: '/virtualOrganization',
-      component: 'virtualOrganization/view',
-    },
-    {
-      name: '绑定设备',
-      path: '/virtualOrganization/device',
-      component: 'virtualOrganization/device/view',
-      hideInMenu: true,
-    },
-    {
       name: '系统设置',
       path: '/system',
       routes: [

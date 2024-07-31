@@ -15,7 +15,8 @@ const View = () => {
     },
   );
 
-  const items: DescriptionsProps['items'] = [
+
+  const sysItems: DescriptionsProps['items'] = [
     {
       key: '1',
       label: '视图库用户名',
@@ -78,9 +79,10 @@ const View = () => {
     },
   ];
 
+
   return (
     <Box style={{ width: '600px' }}>
-      <Descriptions column={2} title="系统信息" items={items} />
+      <Descriptions column={2} title="系统信息" items={sysItems} />
     </Box>
   );
 };

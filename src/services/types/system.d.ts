@@ -62,8 +62,8 @@ declare namespace System {
      * 版本号
      */
     version: string;
-    port:string;
-    host:string;
+    port: string;
+    host: string;
   };
 
   type Statistics = {
@@ -73,5 +73,22 @@ declare namespace System {
     count: number;
     tag: string;
     title: string;
+  };
+
+  type LinkData = {
+    cascade: {
+      online_count: number;
+      count: number;
+    };
+    devices: {
+      online_count: number;
+      count: number;
+    };
+    notifications: number;
+    platform: {
+      online_count: number;
+      count: number;
+    };
+    subscription: number;
   };
 }
