@@ -14,3 +14,9 @@ export const CACHE_CLEAR_TIME = 1000 * 60 * 60 * 24 * 1;
 
 //轮询时间
 export const POLLING_TIME = 10000;
+
+//copyright
+export const LNTON_COPYRIGHT = 'www.easydarwin.org';
+
+//copyrightLike
+export const LNTON_COPYRIGHT_LIKE = 'https://www.easydarwin.org/'
