@@ -78,6 +78,7 @@ const View: React.FC = () => {
   //切换页面清除筛选条件
   const onChangeClearSearch = (key: string) => {
     setCurrentPageKey(key);
+    setSearchIdValue('')
   };
 
   //筛选组件
@@ -107,7 +108,7 @@ const View: React.FC = () => {
     <div
       className={
         currentPageKey == findMotorVehicles
-          ? 'flex mt-3 justify-between'
+          ? 'flex mt-3'
           : 'flex'
       }
     >
@@ -134,7 +135,7 @@ const View: React.FC = () => {
       />
       {currentPageKey == findMotorVehicles && (
         <Search
-          className="w-80"
+          className="w-80 ml-2"
           enterButton
           placeholder="请输入车辆牌照"
           onSearch={(value: string) => {

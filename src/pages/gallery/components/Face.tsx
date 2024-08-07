@@ -146,7 +146,7 @@ const Face: React.FC = () => {
   useUpdateEffect(() => {    
     setPagination({
       ...pagination,
-      DeviceID: sharedData.searchIdValue ?? sharedData.deviceID,
+      DeviceID: sharedData.searchIdValue ?? '',
       start_at: sharedData.searchTimeValue?.start,
       end_at: sharedData.searchTimeValue?.end,
     });

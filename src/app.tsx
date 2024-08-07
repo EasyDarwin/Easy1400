@@ -16,7 +16,7 @@ import { getConfig, setConfig } from './services/store/local';
 export const layout: RunTimeLayoutConfig = () => {
   return {
     title: getConfig('title'),
-    logo: '',
+    logo: './favicon.ico',
     rightContentRender: () => <FooterContent />,
     footerRender: () => <Footer />,
   };
