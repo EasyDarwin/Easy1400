@@ -1,17 +1,17 @@
 import { useQuery, useSearchParams } from '@umijs/max';
 import React, { useRef, useState } from 'react';
 
-import { PageContainer } from '@ant-design/pro-components';
-import { Button, Space, Tooltip, Form, Input, Select, DatePicker, Row, Col } from 'antd';
-import Table, { ColumnsType } from 'antd/es/table';
-import Search from 'antd/es/input/Search';
-import Box from '@/components/box/Box';
-import { FindNotifies, findNotifies } from '@/services/http/cascade';
 import FunctionBar, { ButtonList } from '@/components/bar/FunctionBar';
-import { ErrorHandle } from '@/services/http/http';
-import { TagsOutlined, ArrowLeftOutlined } from '@ant-design/icons';
-import { AxiosResponse } from 'axios';
+import Box from '@/components/box/Box';
 import InfoModal, { IInfoModalRef } from '@/pages/gallery/components/InfoModal';
+import { FindNotifies, findNotifies } from '@/services/http/cascade';
+import { ErrorHandle } from '@/services/http/http';
+import { ArrowLeftOutlined, TagsOutlined } from '@ant-design/icons';
+import { PageContainer } from '@ant-design/pro-components';
+import { Button, DatePicker, Select, Space, Tooltip } from 'antd';
+import Search from 'antd/es/input/Search';
+import Table, { ColumnsType } from 'antd/es/table';
+import { AxiosResponse } from 'axios';
 // import InfoModal, { InfoModalRef } from '../notification/components/InfoModal';
 import { timeToFormatTime } from '@/package/time/time';
 
@@ -28,7 +28,10 @@ const Notification: React.FC = () => {
     { value: 'DeviceList', label: '采集设备目录' },
     { value: 'DeviceStatusList', label: '采集设备状态' },
   ]);
-  const infoTypeEnums = infoTypes.reduce((pre = {} , cur) => ({ ...pre, [cur.value]: cur.label }), {})
+  const infoTypeEnums = infoTypes.reduce(
+    (pre = {}, cur) => ({ ...pre, [cur.value]: cur.label }),
+    {},
+  );
   const InfoModalRef = useRef<IInfoModalRef>();
 
   const columns: ColumnsType<Cascade.NotifyItem> = [
@@ -56,7 +59,7 @@ const Notification: React.FC = () => {
       dataIndex: 'info_ids',
       align: 'center',
       width: 180,
-      render: (text: string) => <span>{infoTypeEnums[text] || ''}</span>
+      render: (text: string) => <span>{infoTypeEnums[text] || ''}</span>,
     },
     {
       title: '订阅ID',
@@ -92,13 +95,23 @@ const Notification: React.FC = () => {
       align: 'center',
       fixed: 'right',
       width: 120,
-      render: (_: any, record: Cascade.NotifyItem) => {
+      render: (_: any, record: any) => {
         return (
           <Space>
             <Tooltip title="记录详情">
               <Button
                 onClick={() => {
-                  InfoModalRef.current?.init(record.info_ids.replace('ObjectList', ''), record)
+                  const key = record.info_ids.replace('ObjectList', '');
+                  const keyList = getDataList(record.info_ids);
+                  console.log('keyList', keyList,record.Ext);
+                  //TODO 这块代码乱套
+                  if (!keyList) return;
+                  console.log('record', record.Ext[keyList[0]][keyList[1]][keyList[2]],key);
+                  const data = record['Ext'][keyList[0]][keyList[1]][keyList[2]]
+                  InfoModalRef.current?.init(
+                    key,
+                    data[0],
+                  );
                 }}
                 icon={<TagsOutlined />}
               />
@@ -108,6 +121,23 @@ const Notification: React.FC = () => {
       },
     },
   ];
+
+  const getDataList = (key: string) => {
+    switch (key) {
+      case 'DeviceList':
+        return;
+      case 'FaceObjectList':
+        return ['FaceObjectList','FaceListObject', 'FaceObject'];
+      case 'PersonObjectList':
+        return ['PersonObjectList','PersonListObject', 'PersonObject'];
+      case 'MotorVehicleObjectList':
+        return ['MotorVehicle0bjectList','MotorVehicleListObject', 'MotorVehicleObject'];
+      case 'NonMotorVehicleObjectList':
+        return ['NonMotorvehicle0bjectList','NonMotorVehicleListObject', 'NonMotorVehicleObject'];
+      default:
+        return;
+    }
+  };
 
   const [params, setParams] = useState<Cascade.NotificationListReq>({
     PageRecordNum: 10,
@@ -119,20 +149,24 @@ const Notification: React.FC = () => {
     value: '',
     timeRange: [],
     start_at: '',
-    end_at: ''
+    end_at: '',
   });
 
   const { data: notificationData, isLoading: notificationLoading } =
     useQuery<Cascade.NotifyListRes>(
       [findNotifies, params],
       () => {
-        const { timeRange, ...others } = params
+        const { timeRange, ...others } = params;
         return FindNotifies({
-          ...others, ...timeRange?.length ? {
-            start_at: timeRange[0].unix(),
-            end_at: timeRange[1].unix(),
-          } : {}
-        }).then((res: AxiosResponse) => res.data)},
+          ...others,
+          ...(timeRange?.length
+            ? {
+                start_at: timeRange[0].unix(),
+                end_at: timeRange[1].unix(),
+              }
+            : {}),
+        }).then((res: AxiosResponse) => res.data);
+      },
       {
         refetchInterval: 10000,
         onError: ErrorHandle,
@@ -145,9 +179,9 @@ const Notification: React.FC = () => {
       icon: <ArrowLeftOutlined />,
       onClick: () => {
         history.back();
-      }
-    }
-  ]
+      },
+    },
+  ];
 
   const funcSearchComponet = (
     <div className="flex justify-between">
@@ -160,9 +194,9 @@ const Notification: React.FC = () => {
           setParams({ ...params, timeRange: value });
         }}
       />
-      <Select 
-        placeholder="请选择图片类型" 
-        allowClear 
+      <Select
+        placeholder="请选择图片类型"
+        allowClear
         className="mr-2 w-60"
         options={infoTypes}
         onChange={(value: string) => {
@@ -203,11 +237,12 @@ const Notification: React.FC = () => {
             pageSize: params.PageRecordNum,
             current: params.RecordStartNo,
             onChange: (RecordStartNo: number, PageRecordNum: number) => {
-              setParams({ 
-                ...params, 
-                RecordStartNo: PageRecordNum !== params.PageRecordNum ? 1 : RecordStartNo, 
-                PageRecordNum
-              })
+              setParams({
+                ...params,
+                RecordStartNo:
+                  PageRecordNum !== params.PageRecordNum ? 1 : RecordStartNo,
+                PageRecordNum,
+              });
             },
             showTotal: (total) => `共 ${total} 条`,
           }}

@@ -38,12 +38,6 @@ export default defineConfig({
       hideInMenu: true,
     },
     {
-      name: '通知记录',
-      path: '/upward/cascade/notification',
-      component: 'cascade/upward/notification/view',
-      hideInMenu: true,
-    },
-    {
       name: '上报记录',
       path: '/upward/cascade/reporting',
       component: 'cascade/upward/reporting/view',
